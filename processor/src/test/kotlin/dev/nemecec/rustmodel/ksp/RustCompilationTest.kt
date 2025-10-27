@@ -61,8 +61,11 @@ class RustCompilationTest {
 
         // Check if cargo is available
         val cargoAvailable = try {
-            ProcessBuilder("cargo", "--version").start().waitFor() == 0
-        } catch (e: Exception) {
+            ProcessBuilder("cargo", "--version")
+              .redirectErrorStream(true)
+              .redirectOutput(ProcessBuilder.Redirect.INHERIT)
+              .start().waitFor() == 0
+        } catch (_: Exception) {
             false
         }
         Assumptions.assumeTrue(cargoAvailable, "Cargo is not available. Please install Rust toolchain.")
@@ -88,7 +91,6 @@ class RustCompilationTest {
         val rustCode = generateRustCode("User.kt", kotlinSource)
         val cargoOutput = compileAndRunRustTest(
             rustCode = rustCode,
-            moduleName = "user",
             testCode = """
                 #[test]
                 fn test_deserialize_and_serialize() {
@@ -132,7 +134,6 @@ class RustCompilationTest {
         val rustCode = generateRustCode("Profile.kt", kotlinSource)
         val cargoOutput = compileAndRunRustTest(
             rustCode = rustCode,
-            moduleName = "profile",
             testCode = """
                 #[test]
                 fn test_nullable_fields() {
@@ -173,7 +174,6 @@ class RustCompilationTest {
         val rustCode = generateRustCode("Container.kt", kotlinSource)
         val cargoOutput = compileAndRunRustTest(
             rustCode = rustCode,
-            moduleName = "container",
             testCode = """
                 #[test]
                 fn test_collections() {
@@ -213,7 +213,6 @@ class RustCompilationTest {
         val rustCode = generateRustCode("Status.kt", kotlinSource)
         val cargoOutput = compileAndRunRustTest(
             rustCode = rustCode,
-            moduleName = "status",
             testCode = """
                 #[test]
                 fn test_enum_serialization() {
@@ -250,7 +249,6 @@ class RustCompilationTest {
         val rustCode = generateRustCode("Person.kt", kotlinSource)
         val cargoOutput = compileAndRunRustTest(
             rustCode = rustCode,
-            moduleName = "person",
             testCode = """
                 #[test]
                 fn test_field_name_conversion() {
@@ -299,7 +297,6 @@ class RustCompilationTest {
 
     private fun compileAndRunRustTest(
         rustCode: String,
-        @Suppress("UNUSED_PARAMETER") moduleName: String,
         testCode: String
     ): String {
         // Create a temporary Cargo project
@@ -336,7 +333,7 @@ class RustCompilationTest {
 
         // Run cargo test
         val process = ProcessBuilder()
-            .command("cargo", "test", "--quiet")
+            .command("cargo", "test", "--quiet", "--color", "never")
             .directory(cargoDir)
             .redirectErrorStream(true)
             .start()
