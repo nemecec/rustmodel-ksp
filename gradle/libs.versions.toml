@@ -2,9 +2,9 @@
 # Versions compatible with kotlin-compile-testing-ksp 1.5.0
 kotlin = "1.9.22"
 ksp = "1.9.22-1.0.17"
-kotlinx-serialization = "1.6.2"
+kotlinx-serialization = "1.9.0"
 kotlinpoet = "1.16.0"
-kotlin-compile-testing = "1.5.0"
+kotlin-compile-testing = "1.6.0"
 junit = "5.11.3"
 junit-platform = "1.11.3"
 assertk = "0.28.1"
