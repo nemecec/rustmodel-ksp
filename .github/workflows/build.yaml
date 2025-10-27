@@ -1,0 +1,43 @@
+name: Build
+
+on:
+  pull_request: { }
+  workflow_dispatch: { }
+  push:
+    branches:
+      - 'main'
+    tags-ignore:
+      - '**'
+
+env:
+  GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g -Dorg.gradle.daemon=false -Dkotlin.incremental=false -Drust.compilation.tests.enabled=true"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: 'adopt'
+          java-version: 21
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+
+      - name: Build with Gradle
+        uses: gradle/actions/setup-gradle@v5
+      - run: ./gradlew build
+      - run: ./gradlew -p example build
+
+      - name: Test Report
+        uses: dorny/test-reporter@v2
+        if: ${{ !cancelled() }}       # run this step even if previous step failed
+        with:
+          name: JUnit Tests
+          path: '**/build/test-results/test/TEST-*.xml'
+          reporter: java-junit
+
+      - uses: mikepenz/action-junit-report@v5
+        if: success() || failure()
+        with:
+          report_paths: '**/build/test-results/test/TEST-*.xml'
