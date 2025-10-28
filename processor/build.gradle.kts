@@ -13,10 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.KotlinJvm
 
 plugins {
   alias(libs.plugins.kotlin.jvm)
   alias(libs.plugins.kotlin.serialization)
+  alias(libs.plugins.maven.publish)
+  alias(libs.plugins.spotless)
 }
 
 dependencies {
@@ -38,14 +42,21 @@ kotlin {
   jvmToolchain(17)
 }
 
-tasks.named<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>("compileTestKotlin") {
-  compilerOptions {
-    allWarningsAsErrors.set(false)
-  }
-}
-
 tasks.test {
   useJUnitPlatform()
   // Pass system properties to tests
   systemProperty("rust.compilation.tests.enabled", System.getProperty("rust.compilation.tests.enabled", "false"))
+}
+
+mavenPublishing {
+  configure(
+    KotlinJvm(javadocJar = JavadocJar.Empty())
+  )
+}
+
+spotless {
+  kotlin {
+    target("src/**/*.kt")
+    ktfmt(libs.versions.ktfmt.get()).googleStyle()
+  }
 }

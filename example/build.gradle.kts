@@ -18,6 +18,7 @@ plugins {
   alias(libs.plugins.kotlin.jvm)
   alias(libs.plugins.kotlin.serialization)
   alias(libs.plugins.ksp)
+  alias(libs.plugins.spotless)
 }
 
 dependencies {
@@ -33,4 +34,11 @@ ksp {
   arg("rust.output.dir", "${project.layout.buildDirectory.get()}/generated/rust")
   arg("rust.filter.packages", "com.example.models")
   // arg("rust.filter.files", "User.kt,Product.kt")
+}
+
+spotless {
+  kotlin {
+    target("src/**/*.kt")
+    ktfmt(libs.versions.ktfmt.get()).googleStyle()
+  }
 }

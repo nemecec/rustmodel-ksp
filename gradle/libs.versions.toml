@@ -1,8 +1,10 @@
 [versions]
 kotlinversion = "2.2.20"
 ksp = "2.3.0"
+ktfmt = "0.47"
 dokka = "2.0.0"
 maven-publish = "0.34.0"
+spotless = "8.0.0"
 kotlinx-serialization = "1.6.2"
 kotlinpoet = "1.16.0"
 kctfork = "0.11.0"
@@ -27,3 +29,4 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 maven-publish = { id = "com.vanniktech.maven.publish.base", version.ref = "maven-publish" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
