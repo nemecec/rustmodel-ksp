@@ -55,7 +55,7 @@ subprojects {
           )
         )
         reportUndocumented.set(false)
-        jdkVersion.set(8)
+        jdkVersion.set(17)
 
         sourceLink {
           localDirectory.set(rootProject.projectDir)
@@ -72,7 +72,7 @@ subprojects {
     enabled = project.findProperty("signingInMemoryKey") != null
   }
 
-  val javaVersion = JavaVersion.VERSION_1_8
+  val javaVersion = JavaVersion.VERSION_17
 
   tasks.withType(JavaCompile::class.java).configureEach {
     sourceCompatibility = javaVersion.toString()
