@@ -22,25 +22,25 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSDeclaration
 import com.google.devtools.ksp.symbol.KSTypeReference
 
-private const val DERIVES_FOR_STRUCT = "Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize"
-private const val DERIVES_FOR_ENUM = "Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize"
+private const val DERIVES_FOR_STRUCT =
+  "Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize"
+private const val DERIVES_FOR_ENUM =
+  "Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize"
 
-/**
- * Represents a parsed annotation configuration with qualified name and argument name
- */
+/** Represents a parsed annotation configuration with qualified name and argument name */
 private data class AnnotationConfig(val qualifiedName: String, val argumentName: String)
 
 /**
- * Parses annotation configuration string in format "qualified.name.ArgumentName"
- * Throws IllegalArgumentException if format is invalid
+ * Parses annotation configuration string in format "qualified.name.ArgumentName" Throws
+ * IllegalArgumentException if format is invalid
  */
 private fun String.parseAnnotationConfig(): AnnotationConfig {
   val lastDotIndex = lastIndexOf('.')
 
   require(lastDotIndex != -1 && lastDotIndex < length - 1) {
     "Invalid annotation configuration format: '$this'. " +
-        "Expected format: 'qualified.annotation.Name.argumentName' " +
-        "(e.g., 'kotlinx.serialization.SerialName.value')"
+      "Expected format: 'qualified.annotation.Name.argumentName' " +
+      "(e.g., 'kotlinx.serialization.SerialName.value')"
   }
 
   val qualifiedName = substring(0, lastDotIndex)
@@ -57,18 +57,14 @@ private fun String.parseAnnotationConfig(): AnnotationConfig {
   return AnnotationConfig(qualifiedName, argumentName)
 }
 
-/**
- * Generates Rust code from Kotlin class declarations
- */
-class RustCodeGenerator(
-  discriminatorAnnotations: Set<String>,
-  serialNameAnnotation: String
-) {
+/** Generates Rust code from Kotlin class declarations */
+class RustCodeGenerator(discriminatorAnnotations: Set<String>, serialNameAnnotation: String) {
   // Validate configurations on initialization to fail fast
   private val serialNameConfig: AnnotationConfig = serialNameAnnotation.parseAnnotationConfig()
-  private val discriminatorConfigs: Map<String, AnnotationConfig> = discriminatorAnnotations
-    .associateWith { it.parseAnnotationConfig() }
-    .mapKeys { it.value.qualifiedName }
+  private val discriminatorConfigs: Map<String, AnnotationConfig> =
+    discriminatorAnnotations
+      .associateWith { it.parseAnnotationConfig() }
+      .mapKeys { it.value.qualifiedName }
 
   fun generateStruct(declaration: KSClassDeclaration): String {
     val builder = StringBuilder()
@@ -77,7 +73,9 @@ class RustCodeGenerator(
     builder.addDerives(DERIVES_FOR_STRUCT)
 
     // Add struct definition
-    builder.append("pub struct ${TypeMapper.toRustPascalCaseName(declaration.simpleName.asString())} {\n")
+    builder.append(
+      "pub struct ${TypeMapper.toRustPascalCaseName(declaration.simpleName.asString())} {\n"
+    )
 
     // Add fields
     declaration.getAllProperties().forEach { property ->
@@ -118,7 +116,9 @@ class RustCodeGenerator(
     builder.addDerives(DERIVES_FOR_ENUM)
 
     // Add enum definition
-    builder.append("pub enum ${TypeMapper.toRustPascalCaseName(declaration.simpleName.asString())} {\n")
+    builder.append(
+      "pub enum ${TypeMapper.toRustPascalCaseName(declaration.simpleName.asString())} {\n"
+    )
 
     // Add enum variants
     declaration.declarations
@@ -133,7 +133,8 @@ class RustCodeGenerator(
         val nameToSerialize = serialName ?: originalEntryName
 
         // Add serde rename attribute if the serialization name differs from the Rust variant name
-        // This handles both explicit @SerialName annotations and SCREAMING_SNAKE_CASE to PascalCase conversions
+        // This handles both explicit @SerialName annotations and SCREAMING_SNAKE_CASE to PascalCase
+        // conversions
         if (variantName != nameToSerialize) {
           builder.append("    #[serde(rename = \"$nameToSerialize\")]\n")
         }
@@ -146,7 +147,10 @@ class RustCodeGenerator(
     return builder.toString()
   }
 
-  fun generateSealedEnum(declaration: KSClassDeclaration, subclasses: List<KSClassDeclaration>): String {
+  fun generateSealedEnum(
+    declaration: KSClassDeclaration,
+    subclasses: List<KSClassDeclaration>,
+  ): String {
     val builder = StringBuilder()
 
     builder.addDocComments(declaration)
@@ -157,7 +161,9 @@ class RustCodeGenerator(
     builder.append("#[serde(tag = \"$discriminator\")]\n")
 
     // Add enum definition
-    builder.append("pub enum ${TypeMapper.toRustPascalCaseName(declaration.simpleName.asString())} {\n")
+    builder.append(
+      "pub enum ${TypeMapper.toRustPascalCaseName(declaration.simpleName.asString())} {\n"
+    )
 
     // Add variants for each subclass
     subclasses.forEach { subclass ->
@@ -192,9 +198,7 @@ class RustCodeGenerator(
   private fun KSDeclaration.extractDocComment(): String {
     val docString = docString ?: return ""
 
-    return docString.lines()
-      .joinToString("\n") { line -> "/// ${line.trim()}" }
-      .plus("\n")
+    return docString.lines().joinToString("\n") { line -> "/// ${line.trim()}" }.plus("\n")
   }
 
   private fun KSAnnotated.getSerialName(): String? {
@@ -207,18 +211,17 @@ class RustCodeGenerator(
 
   private fun KSClassDeclaration.getTypeDiscriminator(): String {
     // Look for discriminator annotations
-    val polymorphicAnnotation = annotations.find {
-      it.annotationType.getQualifiedName() in discriminatorConfigs.keys
-    }
+    val polymorphicAnnotation =
+      annotations.find { it.annotationType.getQualifiedName() in discriminatorConfigs.keys }
 
     if (polymorphicAnnotation != null) {
       val qualifiedName = polymorphicAnnotation.annotationType.getQualifiedName()
       val config = qualifiedName?.let { discriminatorConfigs[it] }
 
       if (config != null) {
-        val value = polymorphicAnnotation.arguments
-          .find { it.name?.asString() == config.argumentName }
-          ?.value as? String
+        val value =
+          polymorphicAnnotation.arguments.find { it.name?.asString() == config.argumentName }?.value
+            as? String
 
         if (value != null) return value
       }
@@ -227,15 +230,14 @@ class RustCodeGenerator(
     return "type" // Default discriminator
   }
 
-  private fun KSTypeReference.getQualifiedName() =
-    resolve().declaration.qualifiedName?.asString()
+  private fun KSTypeReference.getQualifiedName() = resolve().declaration.qualifiedName?.asString()
 
   fun generateFileHeader(moduleName: String): String {
     return """
             //! Auto-generated Rust module from Kotlin sources
             //! Module: $moduleName
 
-        """.trimIndent()
+        """
+      .trimIndent()
   }
-
 }

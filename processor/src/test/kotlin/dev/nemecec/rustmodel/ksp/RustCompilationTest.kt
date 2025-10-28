@@ -29,6 +29,7 @@ import dev.nemecec.rustmodel.ksp.fixtures.Person
 import dev.nemecec.rustmodel.ksp.fixtures.Profile
 import dev.nemecec.rustmodel.ksp.fixtures.Status
 import dev.nemecec.rustmodel.ksp.fixtures.User
+import java.io.File
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
@@ -36,7 +37,6 @@ import org.junit.jupiter.api.Assumptions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
-import java.io.File
 
 /**
  * Integration tests that validate the generated Rust code by:
@@ -47,11 +47,11 @@ import java.io.File
  * These tests require:
  * - Rust toolchain (cargo) to be installed
  * - C compiler (for linking Rust dependencies)
- * - On macOS: Xcode command-line tools with license agreement accepted
- *   Use `xcode-select --install` to install and then `sudo xcodebuild -license accept`
+ * - On macOS: Xcode command-line tools with license agreement accepted Use `xcode-select --install`
+ *   to install and then `sudo xcodebuild -license accept`
  *
- * To run these tests, set the system property: -Drust.compilation.tests.enabled=true
- * Example: ./gradlew :processor:test -Drust.compilation.tests.enabled=true
+ * To run these tests, set the system property: -Drust.compilation.tests.enabled=true Example:
+ * ./gradlew :processor:test -Drust.compilation.tests.enabled=true
  */
 class RustCompilationTest {
 
@@ -60,26 +60,24 @@ class RustCompilationTest {
     val enabled = System.getProperty("rust.compilation.tests.enabled", "false").toBoolean()
     Assumptions.assumeTrue(
       enabled,
-      "Rust compilation tests are disabled. Enable with -Drust.compilation.tests.enabled=true"
+      "Rust compilation tests are disabled. Enable with -Drust.compilation.tests.enabled=true",
     )
 
     // Check if cargo is available
-    val cargoAvailable = try {
-      val process = ProcessBuilder("cargo", "--version")
-        .redirectErrorStream(true)
-        .start()
-      val output = process.inputStream.bufferedReader().readText()
-      println("Using $output")
-      process.waitFor() == 0
-    } catch (e: Exception) {
-      println("Error while running Cargo: $e")
-      false
-    }
+    val cargoAvailable =
+      try {
+        val process = ProcessBuilder("cargo", "--version").redirectErrorStream(true).start()
+        val output = process.inputStream.bufferedReader().readText()
+        println("Using $output")
+        process.waitFor() == 0
+      } catch (e: Exception) {
+        println("Error while running Cargo: $e")
+        false
+      }
     Assumptions.assumeTrue(cargoAvailable, "Cargo is not available. Please install Rust toolchain.")
   }
 
-  @TempDir
-  lateinit var tempDir: File
+  @TempDir lateinit var tempDir: File
 
   private val json = Json { prettyPrint = false }
 
@@ -88,17 +86,15 @@ class RustCompilationTest {
     val kotlinSource = readFixtureSource("User.kt")
 
     // Create Kotlin object and serialize to JSON
-    val userInstance = User(
-      id = 123,
-      name = "John Doe",
-      email = "john@example.com"
-    )
+    val userInstance = User(id = 123, name = "John Doe", email = "john@example.com")
     val testInstance = json.encodeToString(userInstance)
 
     val rustCode = generateRustCode("User.kt", kotlinSource)
-    val cargoOutput = compileAndRunRustTest(
-      rustCode = rustCode,
-      testCode = """
+    val cargoOutput =
+      compileAndRunRustTest(
+        rustCode = rustCode,
+        testCode =
+          """
                 #[test]
                 fn test_deserialize_and_serialize() {
                     let json_input = r#"$testInstance"#;
@@ -110,11 +106,13 @@ class RustCompilationTest {
                     let json_output = serde_json::to_string(&user).unwrap();
                     assert_eq!(json_output, json_input);
                 }
-            """.trimIndent()
-    )
+            """
+            .trimIndent(),
+      )
 
     // Check that the test passed - look for either the "ok" or "passed" message
-    val testPassed = cargoOutput.contains("test test_deserialize_and_serialize ... ok") ||
+    val testPassed =
+      cargoOutput.contains("test test_deserialize_and_serialize ... ok") ||
         cargoOutput.contains("test result: ok")
     assertThat(testPassed).isTrue()
   }
@@ -124,24 +122,19 @@ class RustCompilationTest {
     val kotlinSource = readFixtureSource("Profile.kt")
 
     // Create Kotlin objects and serialize to JSON
-    val profileWithNulls = Profile(
-      userId = 42,
-      bio = null,
-      avatar = null
-    )
+    val profileWithNulls = Profile(userId = 42, bio = null, avatar = null)
     val testWithNulls = json.encodeToString(profileWithNulls)
 
-    val profileWithValues = Profile(
-      userId = 42,
-      bio = "Software developer",
-      avatar = "https://example.com/avatar.jpg"
-    )
+    val profileWithValues =
+      Profile(userId = 42, bio = "Software developer", avatar = "https://example.com/avatar.jpg")
     val testWithValues = json.encodeToString(profileWithValues)
 
     val rustCode = generateRustCode("Profile.kt", kotlinSource)
-    val cargoOutput = compileAndRunRustTest(
-      rustCode = rustCode,
-      testCode = """
+    val cargoOutput =
+      compileAndRunRustTest(
+        rustCode = rustCode,
+        testCode =
+          """
                 #[test]
                 fn test_nullable_fields() {
                     // Test with null values
@@ -158,10 +151,12 @@ class RustCompilationTest {
                     assert_eq!(profile2.bio, Some("Software developer".to_string()));
                     assert_eq!(profile2.avatar, Some("https://example.com/avatar.jpg".to_string()));
                 }
-            """.trimIndent()
-    )
+            """
+            .trimIndent(),
+      )
 
-    val testPassed = cargoOutput.contains("test test_nullable_fields ... ok") ||
+    val testPassed =
+      cargoOutput.contains("test test_nullable_fields ... ok") ||
         cargoOutput.contains("test result: ok")
     assertThat(testPassed).isTrue()
   }
@@ -171,17 +166,20 @@ class RustCompilationTest {
     val kotlinSource = readFixtureSource("Container.kt")
 
     // Create Kotlin object and serialize to JSON
-    val containerInstance = Container(
-      items = listOf("item1", "item2", "item3"),
-      tags = setOf("tag1", "tag2"),
-      metadata = mapOf("key1" to "value1", "key2" to "value2")
-    )
+    val containerInstance =
+      Container(
+        items = listOf("item1", "item2", "item3"),
+        tags = setOf("tag1", "tag2"),
+        metadata = mapOf("key1" to "value1", "key2" to "value2"),
+      )
     val testJson = json.encodeToString(containerInstance)
 
     val rustCode = generateRustCode("Container.kt", kotlinSource)
-    val cargoOutput = compileAndRunRustTest(
-      rustCode = rustCode,
-      testCode = """
+    val cargoOutput =
+      compileAndRunRustTest(
+        rustCode = rustCode,
+        testCode =
+          """
                 #[test]
                 fn test_collections() {
                     let json_input = r#"$testJson"#;
@@ -200,10 +198,12 @@ class RustCompilationTest {
                     assert_eq!(container.metadata.get("key1"), Some(&"value1".to_string()));
                     assert_eq!(container.metadata.get("key2"), Some(&"value2".to_string()));
                 }
-            """.trimIndent()
-    )
+            """
+            .trimIndent(),
+      )
 
-    val testPassed = cargoOutput.contains("test test_collections ... ok") ||
+    val testPassed =
+      cargoOutput.contains("test test_collections ... ok") ||
         cargoOutput.contains("test result: ok")
     assertThat(testPassed).isTrue()
   }
@@ -218,9 +218,11 @@ class RustCompilationTest {
     val rejectedJson = json.encodeToString(Status.REJECTED)
 
     val rustCode = generateRustCode("Status.kt", kotlinSource)
-    val cargoOutput = compileAndRunRustTest(
-      rustCode = rustCode,
-      testCode = """
+    val cargoOutput =
+      compileAndRunRustTest(
+        rustCode = rustCode,
+        testCode =
+          """
                 #[test]
                 fn test_enum_serialization() {
                     let pending = Status::Pending;
@@ -233,10 +235,12 @@ class RustCompilationTest {
                     let rejected: Status = serde_json::from_str(r#"$rejectedJson"#).unwrap();
                     assert!(matches!(rejected, Status::Rejected));
                 }
-            """.trimIndent()
-    )
+            """
+            .trimIndent(),
+      )
 
-    val testPassed = cargoOutput.contains("test test_enum_serialization ... ok") ||
+    val testPassed =
+      cargoOutput.contains("test test_enum_serialization ... ok") ||
         cargoOutput.contains("test result: ok")
     assertThat(testPassed).isTrue()
   }
@@ -246,17 +250,16 @@ class RustCompilationTest {
     val kotlinSource = readFixtureSource("Person.kt")
 
     // Create Kotlin object and serialize to JSON
-    val personInstance = Person(
-      firstName = "John",
-      lastName = "Doe",
-      emailAddress = "john@example.com"
-    )
+    val personInstance =
+      Person(firstName = "John", lastName = "Doe", emailAddress = "john@example.com")
     val testJson = json.encodeToString(personInstance)
 
     val rustCode = generateRustCode("Person.kt", kotlinSource)
-    val cargoOutput = compileAndRunRustTest(
-      rustCode = rustCode,
-      testCode = """
+    val cargoOutput =
+      compileAndRunRustTest(
+        rustCode = rustCode,
+        testCode =
+          """
                 #[test]
                 fn test_field_name_conversion() {
                     let json_input = r#"$testJson"#;
@@ -271,10 +274,12 @@ class RustCompilationTest {
                     let json_output = serde_json::to_string(&person).unwrap();
                     assert_eq!(json_output, json_input);
                 }
-            """.trimIndent()
-    )
+            """
+            .trimIndent(),
+      )
 
-    val testPassed = cargoOutput.contains("test test_field_name_conversion ... ok") ||
+    val testPassed =
+      cargoOutput.contains("test test_field_name_conversion ... ok") ||
         cargoOutput.contains("test result: ok")
     assertThat(testPassed).isTrue()
   }
@@ -283,16 +288,15 @@ class RustCompilationTest {
   private fun generateRustCode(fileName: String, kotlinSource: String): String {
     val source = SourceFile.kotlin(fileName, kotlinSource)
 
-    val compilation = KotlinCompilation().apply {
-      useKsp2()
-      sources = listOf(source)
-      symbolProcessorProviders = mutableListOf(RustGeneratorProcessorProvider())
-      inheritClassPath = true
-      kspProcessorOptions = mutableMapOf(
-        "rust.output.dir" to tempDir.absolutePath,
-        "rust.process.all" to "true"
-      )
-    }
+    val compilation =
+      KotlinCompilation().apply {
+        useKsp2()
+        sources = listOf(source)
+        symbolProcessorProviders = mutableListOf(RustGeneratorProcessorProvider())
+        inheritClassPath = true
+        kspProcessorOptions =
+          mutableMapOf("rust.output.dir" to tempDir.absolutePath, "rust.process.all" to "true")
+      }
 
     val result = compilation.compile()
     assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.OK)
@@ -304,17 +308,15 @@ class RustCompilationTest {
     return rustFiles!!.first().readText()
   }
 
-  private fun compileAndRunRustTest(
-    rustCode: String,
-    testCode: String
-  ): String {
+  private fun compileAndRunRustTest(rustCode: String, testCode: String): String {
     // Create a temporary Cargo project
     val cargoDir = File(tempDir, "cargo_project")
     cargoDir.mkdirs()
 
     // Create Cargo.toml
-    File(cargoDir, "Cargo.toml").writeText(
-      """
+    File(cargoDir, "Cargo.toml")
+      .writeText(
+        """
             [package]
             name = "rust_validation_test"
             version = "0.1.0"
@@ -323,16 +325,18 @@ class RustCompilationTest {
             [dependencies]
             serde = { version = "1.0", features = ["derive"] }
             serde_json = "1.0"
-        """.trimIndent()
-    )
+        """
+          .trimIndent()
+      )
 
     // Create src directory
     val srcDir = File(cargoDir, "src")
     srcDir.mkdirs()
 
     // Create lib.rs with the generated Rust code and test
-    File(srcDir, "lib.rs").writeText(
-      """
+    File(srcDir, "lib.rs")
+      .writeText(
+        """
             $rustCode
 
             #[cfg(test)]
@@ -341,14 +345,16 @@ class RustCompilationTest {
 
                 $testCode
             }
-        """.trimIndent()
-    )
+        """
+          .trimIndent()
+      )
 
     // Run cargo test
-    val processBuilder = ProcessBuilder()
-      .command("cargo", "test", "--quiet", "--color", "never")
-      .directory(cargoDir)
-      .redirectErrorStream(true)
+    val processBuilder =
+      ProcessBuilder()
+        .command("cargo", "test", "--quiet", "--color", "never")
+        .directory(cargoDir)
+        .redirectErrorStream(true)
     processBuilder.environment()["RUSTFLAGS"] = "-D warnings"
     val process = processBuilder.start()
 

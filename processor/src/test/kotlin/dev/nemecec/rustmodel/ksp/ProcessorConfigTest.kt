@@ -20,20 +20,17 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
+import java.io.File
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
-import java.io.File
 
 class ProcessorConfigTest {
 
-  @TempDir
-  lateinit var tempDir: File
+  @TempDir lateinit var tempDir: File
 
   @Test
   fun `test shouldProcess with no filters processes all`() {
-    val config = mapOf(
-      "rust.output.dir" to tempDir.absolutePath
-    ).toConfig()
+    val config = mapOf("rust.output.dir" to tempDir.absolutePath).toConfig()
 
     assertThat(config.shouldProcess("com.example", "Test.kt")).isTrue()
     assertThat(config.shouldProcess("com.other", "Other.kt")).isTrue()
@@ -42,10 +39,12 @@ class ProcessorConfigTest {
 
   @Test
   fun `test shouldProcess with package filter`() {
-    val config = mapOf(
-      "rust.output.dir" to tempDir.absolutePath,
-      "rust.filter.packages" to "com.example, org.test"
-    ).toConfig()
+    val config =
+      mapOf(
+          "rust.output.dir" to tempDir.absolutePath,
+          "rust.filter.packages" to "com.example, org.test",
+        )
+        .toConfig()
 
     assertThat(config.shouldProcess("com.example", "Test.kt")).isTrue()
     assertThat(config.shouldProcess("com.example.models", "User.kt")).isTrue()
@@ -57,10 +56,9 @@ class ProcessorConfigTest {
 
   @Test
   fun `test shouldProcess with file filter`() {
-    val config = mapOf(
-      "rust.output.dir" to tempDir.absolutePath,
-      "rust.filter.files" to "User.kt, Profile.kt"
-    ).toConfig()
+    val config =
+      mapOf("rust.output.dir" to tempDir.absolutePath, "rust.filter.files" to "User.kt, Profile.kt")
+        .toConfig()
 
     assertThat(config.shouldProcess("com.example", "User.kt")).isTrue()
     assertThat(config.shouldProcess("com.example", "Profile.kt")).isTrue()
@@ -70,11 +68,13 @@ class ProcessorConfigTest {
 
   @Test
   fun `test shouldProcess with both package and file filters`() {
-    val config = mapOf(
-      "rust.output.dir" to tempDir.absolutePath,
-      "rust.filter.packages" to "com.example",
-      "rust.filter.files" to "User.kt"
-    ).toConfig()
+    val config =
+      mapOf(
+          "rust.output.dir" to tempDir.absolutePath,
+          "rust.filter.packages" to "com.example",
+          "rust.filter.files" to "User.kt",
+        )
+        .toConfig()
 
     // Should match if either filter matches
     assertThat(config.shouldProcess("com.example", "Other.kt")).isTrue()
@@ -85,9 +85,7 @@ class ProcessorConfigTest {
 
   @Test
   fun `test shouldProcess with empty filters`() {
-    val config = mapOf(
-      "rust.output.dir" to tempDir.absolutePath
-    ).toConfig()
+    val config = mapOf("rust.output.dir" to tempDir.absolutePath).toConfig()
 
     // When no filters are set, should process everything
     assertThat(config.shouldProcess("com.example", "Test.kt")).isTrue()
@@ -97,10 +95,9 @@ class ProcessorConfigTest {
 
   @Test
   fun `test shouldProcess with null package and file`() {
-    val config = mapOf(
-      "rust.output.dir" to tempDir.absolutePath,
-      "rust.filter.packages" to "com.example"
-    ).toConfig()
+    val config =
+      mapOf("rust.output.dir" to tempDir.absolutePath, "rust.filter.packages" to "com.example")
+        .toConfig()
 
     assertThat(config.shouldProcess(null, null)).isFalse()
     assertThat(config.shouldProcess(null, "Test.kt")).isFalse()
@@ -108,10 +105,9 @@ class ProcessorConfigTest {
 
   @Test
   fun `test package prefix matching`() {
-    val config = mapOf(
-      "rust.output.dir" to tempDir.absolutePath,
-      "rust.filter.packages" to "com.example"
-    ).toConfig()
+    val config =
+      mapOf("rust.output.dir" to tempDir.absolutePath, "rust.filter.packages" to "com.example")
+        .toConfig()
 
     assertThat(config.shouldProcess("com.example", "Test.kt")).isTrue()
     assertThat(config.shouldProcess("com.example.models", "User.kt")).isTrue()
@@ -122,10 +118,8 @@ class ProcessorConfigTest {
 
   @Test
   fun `test exact file name matching`() {
-    val config = mapOf(
-      "rust.output.dir" to tempDir.absolutePath,
-      "rust.filter.files" to "User.kt"
-    ).toConfig()
+    val config =
+      mapOf("rust.output.dir" to tempDir.absolutePath, "rust.filter.files" to "User.kt").toConfig()
 
     assertThat(config.shouldProcess("com.example", "User.kt")).isTrue()
     assertThat(config.shouldProcess("com.example", "UserModel.kt")).isFalse()
@@ -135,19 +129,19 @@ class ProcessorConfigTest {
   @Test
   fun `test outputDir configuration`() {
     val outputDir = File(tempDir, "custom/rust/output")
-    val config = mapOf(
-      "rust.output.dir" to outputDir.absolutePath
-    ).toConfig()
+    val config = mapOf("rust.output.dir" to outputDir.absolutePath).toConfig()
 
     assertThat(config.outputDir).isEqualTo(outputDir)
   }
 
   @Test
   fun `test multiple package filters`() {
-    val config = mapOf(
-      "rust.output.dir" to tempDir.absolutePath,
-      "rust.filter.packages" to "com.example, org.test, dev.nemecec"
-    ).toConfig()
+    val config =
+      mapOf(
+          "rust.output.dir" to tempDir.absolutePath,
+          "rust.filter.packages" to "com.example, org.test, dev.nemecec",
+        )
+        .toConfig()
 
     assertThat(config.shouldProcess("com.example.models", "Test.kt")).isTrue()
     assertThat(config.shouldProcess("org.test.util", "Test.kt")).isTrue()
@@ -157,10 +151,12 @@ class ProcessorConfigTest {
 
   @Test
   fun `test multiple file filters`() {
-    val config = mapOf(
-      "rust.output.dir" to tempDir.absolutePath,
-      "rust.filter.files" to "User.kt, Profile.kt, Model.kt"
-    ).toConfig()
+    val config =
+      mapOf(
+          "rust.output.dir" to tempDir.absolutePath,
+          "rust.filter.files" to "User.kt, Profile.kt, Model.kt",
+        )
+        .toConfig()
 
     assertThat(config.shouldProcess("com.example", "User.kt")).isTrue()
     assertThat(config.shouldProcess("com.example", "Profile.kt")).isTrue()
@@ -170,51 +166,50 @@ class ProcessorConfigTest {
 
   @Test
   fun `test marker annotations configuration`() {
-    val config = mapOf(
-      "rust.output.dir" to tempDir.absolutePath,
-      "rust.markerAnnotations" to "com.example.CustomAnnotation, org.test.AnotherAnnotation"
-    ).toConfig()
+    val config =
+      mapOf(
+          "rust.output.dir" to tempDir.absolutePath,
+          "rust.markerAnnotations" to "com.example.CustomAnnotation, org.test.AnotherAnnotation",
+        )
+        .toConfig()
 
     // Verify marker annotations are configured correctly
-    assertThat(config.markerAnnotations).isEqualTo(setOf("com.example.CustomAnnotation", "org.test.AnotherAnnotation"))
+    assertThat(config.markerAnnotations)
+      .isEqualTo(setOf("com.example.CustomAnnotation", "org.test.AnotherAnnotation"))
   }
 
   @Test
   fun `test discriminator annotations configuration`() {
-    val config = mapOf(
-      "rust.output.dir" to tempDir.absolutePath,
-      "rust.discriminatorAnnotations" to "com.example.CustomDiscriminator.type, org.test.TypeTag.value"
-    ).toConfig()
+    val config =
+      mapOf(
+          "rust.output.dir" to tempDir.absolutePath,
+          "rust.discriminatorAnnotations" to
+            "com.example.CustomDiscriminator.type, org.test.TypeTag.value",
+        )
+        .toConfig()
 
     // Verify discriminator annotations are configured correctly
-    assertThat(config.discriminatorAnnotations).isEqualTo(
-      setOf(
-        "com.example.CustomDiscriminator.type",
-        "org.test.TypeTag.value"
-      )
-    )
+    assertThat(config.discriminatorAnnotations)
+      .isEqualTo(setOf("com.example.CustomDiscriminator.type", "org.test.TypeTag.value"))
   }
 
   @Test
   fun `test discriminator annotations default value`() {
-    val config = mapOf(
-      "rust.output.dir" to tempDir.absolutePath
-    ).toConfig()
+    val config = mapOf("rust.output.dir" to tempDir.absolutePath).toConfig()
 
     // Verify default discriminator annotations are used
-    assertThat(config.discriminatorAnnotations).isEqualTo(
-      setOf(
-        "kotlinx.serialization.json.JsonClassDiscriminator.discriminator",
-        "kotlinx.serialization.Polymorphic.value"
+    assertThat(config.discriminatorAnnotations)
+      .isEqualTo(
+        setOf(
+          "kotlinx.serialization.json.JsonClassDiscriminator.discriminator",
+          "kotlinx.serialization.Polymorphic.value",
+        )
       )
-    )
   }
 
   @Test
   fun `test serialNameAnnotation default value`() {
-    val config = mapOf(
-      "rust.output.dir" to tempDir.absolutePath
-    ).toConfig()
+    val config = mapOf("rust.output.dir" to tempDir.absolutePath).toConfig()
 
     // Verify default serial name annotation is used
     assertThat(config.serialNameAnnotation).isEqualTo("kotlinx.serialization.SerialName.value")
@@ -222,10 +217,12 @@ class ProcessorConfigTest {
 
   @Test
   fun `test serialNameAnnotation custom value`() {
-    val config = mapOf(
-      "rust.output.dir" to tempDir.absolutePath,
-      "rust.serialNameAnnotation" to "com.example.CustomSerialName.name"
-    ).toConfig()
+    val config =
+      mapOf(
+          "rust.output.dir" to tempDir.absolutePath,
+          "rust.serialNameAnnotation" to "com.example.CustomSerialName.name",
+        )
+        .toConfig()
 
     // Verify custom serial name annotation is configured correctly
     assertThat(config.serialNameAnnotation).isEqualTo("com.example.CustomSerialName.name")

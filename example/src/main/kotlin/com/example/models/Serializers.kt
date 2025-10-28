@@ -16,12 +16,6 @@
 
 package com.example.models
 
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -29,10 +23,14 @@ import java.time.OffsetDateTime
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 
-/**
- * Serializer for java.util.UUID
- */
+/** Serializer for java.util.UUID */
 object UUIDSerializer : KSerializer<UUID> {
   override val descriptor: SerialDescriptor =
     PrimitiveSerialDescriptor("UUID", PrimitiveKind.STRING)
@@ -46,9 +44,7 @@ object UUIDSerializer : KSerializer<UUID> {
   }
 }
 
-/**
- * Serializer for java.time.Instant
- */
+/** Serializer for java.time.Instant */
 object InstantSerializer : KSerializer<Instant> {
   override val descriptor: SerialDescriptor =
     PrimitiveSerialDescriptor("Instant", PrimitiveKind.STRING)
@@ -62,9 +58,7 @@ object InstantSerializer : KSerializer<Instant> {
   }
 }
 
-/**
- * Serializer for java.time.LocalDate
- */
+/** Serializer for java.time.LocalDate */
 object LocalDateSerializer : KSerializer<LocalDate> {
   override val descriptor: SerialDescriptor =
     PrimitiveSerialDescriptor("LocalDate", PrimitiveKind.STRING)
@@ -78,9 +72,7 @@ object LocalDateSerializer : KSerializer<LocalDate> {
   }
 }
 
-/**
- * Serializer for java.time.LocalDateTime
- */
+/** Serializer for java.time.LocalDateTime */
 object LocalDateTimeSerializer : KSerializer<LocalDateTime> {
   override val descriptor: SerialDescriptor =
     PrimitiveSerialDescriptor("LocalDateTime", PrimitiveKind.STRING)
@@ -94,9 +86,7 @@ object LocalDateTimeSerializer : KSerializer<LocalDateTime> {
   }
 }
 
-/**
- * Serializer for java.time.OffsetDateTime
- */
+/** Serializer for java.time.OffsetDateTime */
 object OffsetDateTimeSerializer : KSerializer<OffsetDateTime> {
   override val descriptor: SerialDescriptor =
     PrimitiveSerialDescriptor("OffsetDateTime", PrimitiveKind.STRING)
@@ -110,9 +100,7 @@ object OffsetDateTimeSerializer : KSerializer<OffsetDateTime> {
   }
 }
 
-/**
- * Serializer for java.time.ZonedDateTime
- */
+/** Serializer for java.time.ZonedDateTime */
 object ZonedDateTimeSerializer : KSerializer<ZonedDateTime> {
   override val descriptor: SerialDescriptor =
     PrimitiveSerialDescriptor("ZonedDateTime", PrimitiveKind.STRING)

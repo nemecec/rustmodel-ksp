@@ -29,7 +29,7 @@ class TypeMapperTest {
     "User, User",
     "UserProfile, UserProfile",
     "APIResponse, APIResponse",
-    "XMLParser, XMLParser"
+    "XMLParser, XMLParser",
   )
   fun `test toRustPascalCaseName preserves PascalCase`(input: String, expected: String) {
     assertThat(TypeMapper.toRustPascalCaseName(input)).isEqualTo(expected)
@@ -49,7 +49,7 @@ class TypeMapperTest {
     "streetAddress, street_address",
     "firstName, first_name",
     "MyFile, my_file",
-    "UserModel, user_model"
+    "UserModel, user_model",
   )
   fun `test toRustSnakeCaseName converts camelCase to snake_case`(input: String, expected: String) {
     assertThat(TypeMapper.toRustSnakeCaseName(input)).isEqualTo(expected)
@@ -60,9 +60,12 @@ class TypeMapperTest {
     "PENDING, Pending",
     "APPROVED, Approved",
     "IN_PROGRESS, InProgress",
-    "WAITING_FOR_APPROVAL, WaitingForApproval"
+    "WAITING_FOR_APPROVAL, WaitingForApproval",
   )
-  fun `test toRustEnumVariantName converts SCREAMING_SNAKE_CASE to PascalCase`(input: String, expected: String) {
+  fun `test toRustEnumVariantName converts SCREAMING_SNAKE_CASE to PascalCase`(
+    input: String,
+    expected: String,
+  ) {
     assertThat(TypeMapper.toRustEnumVariantName(input)).isEqualTo(expected)
   }
 
@@ -87,7 +90,8 @@ class TypeMapperTest {
     assertThat(TypeMapper.toRustSnakeCaseName("XMLParser")).isEqualTo("xml_parser")
     assertThat(TypeMapper.toRustSnakeCaseName("parseHTMLString")).isEqualTo("parse_html_string")
     assertThat(TypeMapper.toRustSnakeCaseName("APIResponse")).isEqualTo("api_response")
-    assertThat(TypeMapper.toRustSnakeCaseName("getHTTPSConnection")).isEqualTo("get_https_connection")
+    assertThat(TypeMapper.toRustSnakeCaseName("getHTTPSConnection"))
+      .isEqualTo("get_https_connection")
     assertThat(TypeMapper.toRustSnakeCaseName("HTTPSProxy")).isEqualTo("https_proxy")
   }
 

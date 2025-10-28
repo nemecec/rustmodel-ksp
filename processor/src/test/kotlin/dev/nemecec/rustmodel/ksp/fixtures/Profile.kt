@@ -18,9 +18,4 @@ package dev.nemecec.rustmodel.ksp.fixtures
 
 import kotlinx.serialization.Serializable
 
-@Serializable
-data class Profile(
-  val userId: Int,
-  val bio: String?,
-  val avatar: String?
-)
+@Serializable data class Profile(val userId: Int, val bio: String?, val avatar: String?)

@@ -19,16 +19,15 @@ package dev.nemecec.rustmodel.ksp
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSType
 
-/**
- * Maps Kotlin types to their Rust equivalents
- */
+/** Maps Kotlin types to their Rust equivalents */
 object TypeMapper {
 
   fun mapType(type: KSType, nullable: Boolean = type.isMarkedNullable): String {
-    val baseType = when (val declaration = type.declaration) {
-      is KSClassDeclaration -> mapClassType(declaration, type)
-      else -> "String" // Default fallback
-    }
+    val baseType =
+      when (val declaration = type.declaration) {
+        is KSClassDeclaration -> mapClassType(declaration, type)
+        else -> "String" // Default fallback
+      }
 
     return if (nullable) "Option<$baseType>" else baseType
   }
@@ -59,14 +58,12 @@ object TypeMapper {
         val mapped = elementType?.let { mapType(it) } ?: "String"
         "Vec<$mapped>"
       }
-
       "kotlin.collections.Set",
       "kotlin.collections.MutableSet" -> {
         val elementType = type.arguments.firstOrNull()?.type?.resolve()
         val mapped = elementType?.let { mapType(it) } ?: "String"
         "std::collections::HashSet<$mapped>"
       }
-
       "kotlin.collections.Map",
       "kotlin.collections.MutableMap" -> {
         val keyType = type.arguments.getOrNull(0)?.type?.resolve()
@@ -105,19 +102,16 @@ object TypeMapper {
     // The last capital letter before a lowercase letter starts a new word
     return kotlinName
       // Insert underscore between lowercase and uppercase: camelCase -> camel_Case
-      .replace(Regex("([a-z])([A-Z])")) {
-        "${it.groupValues[1]}_${it.groupValues[2]}"
-      }
+      .replace(Regex("([a-z])([A-Z])")) { "${it.groupValues[1]}_${it.groupValues[2]}" }
       // Insert underscore between consecutive capitals and lowercase: HTTPClient -> HTTP_Client
-      .replace(Regex("([A-Z]+)([A-Z][a-z])")) {
-        "${it.groupValues[1]}_${it.groupValues[2]}"
-      }
+      .replace(Regex("([A-Z]+)([A-Z][a-z])")) { "${it.groupValues[1]}_${it.groupValues[2]}" }
       .lowercase()
   }
 
   fun toRustEnumVariantName(kotlinName: String): String {
     // Convert to PascalCase for enum variants
-    return kotlinName.split("_")
-      .joinToString("") { it.lowercase().replaceFirstChar { c -> c.uppercase() } }
+    return kotlinName.split("_").joinToString("") {
+      it.lowercase().replaceFirstChar { c -> c.uppercase() }
+    }
   }
 }

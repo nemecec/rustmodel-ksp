@@ -19,15 +19,9 @@ package dev.nemecec.rustmodel.ksp
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.processing.SymbolProcessorProvider
 
-/**
- * Provider for the Rust generator KSP processor
- */
+/** Provider for the Rust generator KSP processor */
 class RustGeneratorProcessorProvider : SymbolProcessorProvider {
 
   override fun create(environment: SymbolProcessorEnvironment) =
-    RustGeneratorProcessor(
-      logger = environment.logger,
-      config = environment.options.toConfig()
-    )
-
+    RustGeneratorProcessor(logger = environment.logger, config = environment.options.toConfig())
 }

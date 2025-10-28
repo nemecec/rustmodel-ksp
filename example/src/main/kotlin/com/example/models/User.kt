@@ -16,35 +16,24 @@
 
 package com.example.models
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import java.time.Instant
 import java.util.UUID
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-/**
- * Represents a user in the system
- */
+/** Represents a user in the system */
 @Serializable
 data class User(
-  @Serializable(with = UUIDSerializer::class)
-  val id: UUID,
-  @SerialName("user_name")
-  val userName: String,
+  @Serializable(with = UUIDSerializer::class) val id: UUID,
+  @SerialName("user_name") val userName: String,
   val email: String,
   val age: Int?,
   val isActive: Boolean,
-  @Serializable(with = InstantSerializer::class)
-  val createdAt: Instant,
+  @Serializable(with = InstantSerializer::class) val createdAt: Instant,
   val tags: List<String>,
-  val metadata: Map<String, String>
+  val metadata: Map<String, String>,
 )
 
-/**
- * User preferences
- */
+/** User preferences */
 @Serializable
-data class UserPreferences(
-  val theme: Theme,
-  val notifications: Boolean,
-  val language: String
-)
+data class UserPreferences(val theme: Theme, val notifications: Boolean, val language: String)

@@ -27,13 +27,15 @@ import org.junit.jupiter.api.Test
 
 class RustCodeGeneratorTest {
 
-  private val generator = RustCodeGenerator(
-    discriminatorAnnotations = setOf(
-      "kotlinx.serialization.json.JsonClassDiscriminator.discriminator",
-      "kotlinx.serialization.Polymorphic.value"
-    ),
-    serialNameAnnotation = "kotlinx.serialization.SerialName.value"
-  )
+  private val generator =
+    RustCodeGenerator(
+      discriminatorAnnotations =
+        setOf(
+          "kotlinx.serialization.json.JsonClassDiscriminator.discriminator",
+          "kotlinx.serialization.Polymorphic.value",
+        ),
+      serialNameAnnotation = "kotlinx.serialization.SerialName.value",
+    )
 
   @Test
   fun `test generateFileHeader`() {
@@ -66,64 +68,78 @@ class RustCodeGeneratorTest {
   @Test
   fun `test invalid serialNameAnnotation without dot fails`() {
     assertFailure {
-      RustCodeGenerator(
-        discriminatorAnnotations = setOf("kotlinx.serialization.json.JsonClassDiscriminator.discriminator"),
-        serialNameAnnotation = "NoDotsInThisString"
-      )
-    }.isInstanceOf(IllegalArgumentException::class)
-      .message().isNotNull()
+        RustCodeGenerator(
+          discriminatorAnnotations =
+            setOf("kotlinx.serialization.json.JsonClassDiscriminator.discriminator"),
+          serialNameAnnotation = "NoDotsInThisString",
+        )
+      }
+      .isInstanceOf(IllegalArgumentException::class)
+      .message()
+      .isNotNull()
       .contains("Invalid annotation configuration format", "NoDotsInThisString")
   }
 
   @Test
   fun `test invalid serialNameAnnotation with trailing dot fails`() {
     assertFailure {
-      RustCodeGenerator(
-        discriminatorAnnotations = setOf("kotlinx.serialization.json.JsonClassDiscriminator.discriminator"),
-        serialNameAnnotation = "kotlinx.serialization.SerialName."
-      )
-    }.isInstanceOf(IllegalArgumentException::class)
-      .message().isNotNull()
+        RustCodeGenerator(
+          discriminatorAnnotations =
+            setOf("kotlinx.serialization.json.JsonClassDiscriminator.discriminator"),
+          serialNameAnnotation = "kotlinx.serialization.SerialName.",
+        )
+      }
+      .isInstanceOf(IllegalArgumentException::class)
+      .message()
+      .isNotNull()
       .contains("Invalid annotation configuration format")
   }
 
   @Test
   fun `test invalid serialNameAnnotation with empty argument name fails`() {
     assertFailure {
-      RustCodeGenerator(
-        discriminatorAnnotations = setOf("kotlinx.serialization.json.JsonClassDiscriminator.discriminator"),
-        serialNameAnnotation = "."
-      )
-    }.isInstanceOf(IllegalArgumentException::class)
-      .message().isNotNull()
+        RustCodeGenerator(
+          discriminatorAnnotations =
+            setOf("kotlinx.serialization.json.JsonClassDiscriminator.discriminator"),
+          serialNameAnnotation = ".",
+        )
+      }
+      .isInstanceOf(IllegalArgumentException::class)
+      .message()
+      .isNotNull()
       .contains("Invalid annotation configuration")
   }
 
   @Test
   fun `test invalid discriminatorAnnotation without dot fails`() {
     assertFailure {
-      RustCodeGenerator(
-        discriminatorAnnotations = setOf("NoDot"),
-        serialNameAnnotation = "kotlinx.serialization.SerialName.value"
-      )
-    }.isInstanceOf(IllegalArgumentException::class)
-      .message().isNotNull()
+        RustCodeGenerator(
+          discriminatorAnnotations = setOf("NoDot"),
+          serialNameAnnotation = "kotlinx.serialization.SerialName.value",
+        )
+      }
+      .isInstanceOf(IllegalArgumentException::class)
+      .message()
+      .isNotNull()
       .contains("Invalid annotation configuration format", "NoDot")
   }
 
   @Test
   fun `test invalid discriminatorAnnotation with multiple invalid entries fails`() {
     assertFailure {
-      RustCodeGenerator(
-        discriminatorAnnotations = setOf(
-          "kotlinx.serialization.json.JsonClassDiscriminator.discriminator",
-          "InvalidAnnotation",
-          "kotlinx.serialization.Polymorphic.value"
-        ),
-        serialNameAnnotation = "kotlinx.serialization.SerialName.value"
-      )
-    }.isInstanceOf(IllegalArgumentException::class)
-      .message().isNotNull()
+        RustCodeGenerator(
+          discriminatorAnnotations =
+            setOf(
+              "kotlinx.serialization.json.JsonClassDiscriminator.discriminator",
+              "InvalidAnnotation",
+              "kotlinx.serialization.Polymorphic.value",
+            ),
+          serialNameAnnotation = "kotlinx.serialization.SerialName.value",
+        )
+      }
+      .isInstanceOf(IllegalArgumentException::class)
+      .message()
+      .isNotNull()
       .contains("Invalid annotation configuration format", "InvalidAnnotation")
   }
 }

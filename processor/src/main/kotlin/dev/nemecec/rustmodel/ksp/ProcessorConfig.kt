@@ -19,10 +19,11 @@ package dev.nemecec.rustmodel.ksp
 import java.io.File
 
 private const val DEFAULT_MARKER_ANNOTATION = "kotlinx.serialization.Serializable"
-private val DEFAULT_DISCRIMINATOR_ANNOTATIONS = setOf(
-  "kotlinx.serialization.json.JsonClassDiscriminator.discriminator",
-  "kotlinx.serialization.Polymorphic.value"
-)
+private val DEFAULT_DISCRIMINATOR_ANNOTATIONS =
+  setOf(
+    "kotlinx.serialization.json.JsonClassDiscriminator.discriminator",
+    "kotlinx.serialization.Polymorphic.value",
+  )
 private const val DEFAULT_SERIAL_NAME_ANNOTATION = "kotlinx.serialization.SerialName.value"
 
 fun Map<String, String>.toConfig() =
@@ -30,9 +31,11 @@ fun Map<String, String>.toConfig() =
     outputDir = File(this["rust.output.dir"] ?: "build/generated/rust"),
     filterPackages = this["rust.filter.packages"]?.parseSet() ?: emptySet(),
     filterFiles = this["rust.filter.files"]?.parseSet() ?: emptySet(),
-    markerAnnotations = this["rust.markerAnnotations"]?.parseSet() ?: setOf(DEFAULT_MARKER_ANNOTATION),
-    discriminatorAnnotations = this["rust.discriminatorAnnotations"]?.parseSet() ?: DEFAULT_DISCRIMINATOR_ANNOTATIONS,
-    serialNameAnnotation = this["rust.serialNameAnnotation"] ?: DEFAULT_SERIAL_NAME_ANNOTATION
+    markerAnnotations =
+      this["rust.markerAnnotations"]?.parseSet() ?: setOf(DEFAULT_MARKER_ANNOTATION),
+    discriminatorAnnotations =
+      this["rust.discriminatorAnnotations"]?.parseSet() ?: DEFAULT_DISCRIMINATOR_ANNOTATIONS,
+    serialNameAnnotation = this["rust.serialNameAnnotation"] ?: DEFAULT_SERIAL_NAME_ANNOTATION,
   )
 
 fun String.parseSet() = split(",").map { it.trim() }.filter { it.isNotEmpty() }.toSet()
@@ -58,11 +61,12 @@ data class ProcessorConfig(
     }
     return false
   }
-
 }
 
 private fun Set<String>.anyContains(fileName: String?) =
   isNotEmpty() && fileName != null && contains(fileName)
 
 private fun Set<String>.anyMatches(packageName: String?) =
-  isNotEmpty() && packageName != null && any { filter -> packageName == filter || packageName.startsWith("$filter.") }
+  isNotEmpty() &&
+    packageName != null &&
+    any { filter -> packageName == filter || packageName.startsWith("$filter.") }

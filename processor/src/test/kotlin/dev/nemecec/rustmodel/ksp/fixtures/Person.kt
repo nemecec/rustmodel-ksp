@@ -19,8 +19,4 @@ package dev.nemecec.rustmodel.ksp.fixtures
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Person(
-  val firstName: String,
-  val lastName: String,
-  val emailAddress: String
-)
+data class Person(val firstName: String, val lastName: String, val emailAddress: String)

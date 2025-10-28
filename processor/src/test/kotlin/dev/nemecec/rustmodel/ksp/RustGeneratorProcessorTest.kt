@@ -27,22 +27,22 @@ import com.tschuchort.compiletesting.SourceFile
 import com.tschuchort.compiletesting.kspProcessorOptions
 import com.tschuchort.compiletesting.symbolProcessorProviders
 import com.tschuchort.compiletesting.useKsp2
+import java.io.File
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
-import java.io.File
 
 class RustGeneratorProcessorTest {
 
-  @TempDir
-  lateinit var tempDir: File
+  @TempDir lateinit var tempDir: File
 
   @Test
   fun `test simple data class generation`() {
-    val rustFile = generateSource(
-      KotlinSourceFile(
-        "User.kt",
-        """
+    val rustFile =
+      generateSource(
+        KotlinSourceFile(
+          "User.kt",
+          """
             package com.example
 
             import kotlinx.serialization.Serializable
@@ -53,24 +53,27 @@ class RustGeneratorProcessorTest {
                 val name: String,
                 val email: String
             )
-            """.trimIndent()
+            """
+            .trimIndent(),
+        )
       )
-    )
 
     val content = rustFile.readText()
     assertThat(content).contains("pub struct User")
     assertThat(content).contains("pub id: i32")
     assertThat(content).contains("pub name: String")
     assertThat(content).contains("pub email: String")
-    assertThat(content).contains("#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]")
+    assertThat(content)
+      .contains("#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]")
   }
 
   @Test
   fun `test data class with nullable fields`() {
-    val rustFile = generateSource(
-      KotlinSourceFile(
-        "Profile.kt",
-        """
+    val rustFile =
+      generateSource(
+        KotlinSourceFile(
+          "Profile.kt",
+          """
             package com.example
 
             import kotlinx.serialization.Serializable
@@ -81,9 +84,10 @@ class RustGeneratorProcessorTest {
                 val bio: String?,
                 val avatar: String?
             )
-            """.trimIndent()
+            """
+            .trimIndent(),
+        )
       )
-    )
 
     val content = rustFile.readText()
     assertThat(content).contains("pub user_id: i32")
@@ -94,10 +98,11 @@ class RustGeneratorProcessorTest {
 
   @Test
   fun `test data class with collections`() {
-    val rustFile = generateSource(
-      KotlinSourceFile(
-        "Container.kt",
-        """
+    val rustFile =
+      generateSource(
+        KotlinSourceFile(
+          "Container.kt",
+          """
             package com.example
 
             import kotlinx.serialization.Serializable
@@ -108,9 +113,10 @@ class RustGeneratorProcessorTest {
                 val tags: Set<String>,
                 val metadata: Map<String, String>
             )
-            """.trimIndent()
+            """
+            .trimIndent(),
+        )
       )
-    )
 
     val content = rustFile.readText()
     assertThat(content).contains("pub items: Vec<String>")
@@ -120,10 +126,11 @@ class RustGeneratorProcessorTest {
 
   @Test
   fun `test enum generation`() {
-    val rustFile = generateSource(
-      KotlinSourceFile(
-        "Status.kt",
-        """
+    val rustFile =
+      generateSource(
+        KotlinSourceFile(
+          "Status.kt",
+          """
             package com.example
 
             import kotlinx.serialization.Serializable
@@ -134,24 +141,29 @@ class RustGeneratorProcessorTest {
                 APPROVED,
                 REJECTED
             }
-            """.trimIndent()
+            """
+            .trimIndent(),
+        )
       )
-    )
 
     val content = rustFile.readText()
     assertThat(content).contains("pub enum Status")
     assertThat(content).contains("Pending,")
     assertThat(content).contains("Approved,")
     assertThat(content).contains("Rejected,")
-    assertThat(content).contains("#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]")
+    assertThat(content)
+      .contains(
+        "#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]"
+      )
   }
 
   @Test
   fun `test sealed class generation`() {
-    val rustFile = generateSource(
-      KotlinSourceFile(
-        "Result.kt",
-        """
+    val rustFile =
+      generateSource(
+        KotlinSourceFile(
+          "Result.kt",
+          """
             package com.example
 
             import kotlinx.serialization.Serializable
@@ -164,9 +176,10 @@ class RustGeneratorProcessorTest {
 
             @Serializable
             data class Failure(val error: String) : Result()
-            """.trimIndent()
+            """
+            .trimIndent(),
+        )
       )
-    )
 
     val content = rustFile.readText()
     // Should generate sealed enum
@@ -182,10 +195,11 @@ class RustGeneratorProcessorTest {
 
   @Test
   fun `test SerialName annotation`() {
-    val rustFile = generateSource(
-      KotlinSourceFile(
-        "Entity.kt",
-        """
+    val rustFile =
+      generateSource(
+        KotlinSourceFile(
+          "Entity.kt",
+          """
             package com.example
 
             import kotlinx.serialization.Serializable
@@ -198,9 +212,10 @@ class RustGeneratorProcessorTest {
                 @SerialName("entity_name")
                 val name: String
             )
-            """.trimIndent()
+            """
+            .trimIndent(),
+        )
       )
-    )
 
     val content = rustFile.readText()
     assertThat(content).contains("#[serde(rename = \"entity_id\")]")
@@ -211,10 +226,11 @@ class RustGeneratorProcessorTest {
 
   @Test
   fun `test multiple classes in same file`() {
-    val rustFile = generateSource(
-      KotlinSourceFile(
-        "Models.kt",
-        """
+    val rustFile =
+      generateSource(
+        KotlinSourceFile(
+          "Models.kt",
+          """
             package com.example
 
             import kotlinx.serialization.Serializable
@@ -224,9 +240,10 @@ class RustGeneratorProcessorTest {
 
             @Serializable
             data class Address(val street: String, val city: String)
-            """.trimIndent()
+            """
+            .trimIndent(),
+        )
       )
-    )
 
     val content = rustFile.readText()
     assertThat(content).contains("pub struct Person")
@@ -235,10 +252,11 @@ class RustGeneratorProcessorTest {
 
   @Test
   fun `test numeric types mapping`() {
-    val rustFile = generateSource(
-      KotlinSourceFile(
-        "Numbers.kt",
-        """
+    val rustFile =
+      generateSource(
+        KotlinSourceFile(
+          "Numbers.kt",
+          """
             package com.example
 
             import kotlinx.serialization.Serializable
@@ -256,9 +274,10 @@ class RustGeneratorProcessorTest {
                 val uintVal: UInt,
                 val ulongVal: ULong
             )
-            """.trimIndent()
+            """
+            .trimIndent(),
+        )
       )
-    )
 
     val content = rustFile.readText()
     assertThat(content).contains("pub byte_val: i8")
@@ -275,10 +294,11 @@ class RustGeneratorProcessorTest {
 
   @Test
   fun `test nested generic types`() {
-    val rustFile = generateSource(
-      KotlinSourceFile(
-        "Nested.kt",
-        """
+    val rustFile =
+      generateSource(
+        KotlinSourceFile(
+          "Nested.kt",
+          """
             package com.example
 
             import kotlinx.serialization.Serializable
@@ -289,9 +309,10 @@ class RustGeneratorProcessorTest {
                 val mapOfLists: Map<String, List<Int>>,
                 val optionalList: List<String>?
             )
-            """.trimIndent()
+            """
+            .trimIndent(),
+        )
       )
-    )
 
     val content = rustFile.readText()
     assertThat(content).contains("pub list_of_lists: Vec<Vec<String>>")
@@ -301,10 +322,11 @@ class RustGeneratorProcessorTest {
 
   @Test
   fun `test custom type references`() {
-    val rustFile = generateSource(
-      KotlinSourceFile(
-        "Custom.kt",
-        """
+    val rustFile =
+      generateSource(
+        KotlinSourceFile(
+          "Custom.kt",
+          """
             package com.example
 
             import kotlinx.serialization.Serializable
@@ -318,9 +340,10 @@ class RustGeneratorProcessorTest {
                 val address: Address,
                 val alternateAddresses: List<Address>
             )
-            """.trimIndent()
+            """
+            .trimIndent(),
+        )
       )
-    )
 
     val content = rustFile.readText()
     assertThat(content).contains("pub address: Address")
@@ -329,19 +352,21 @@ class RustGeneratorProcessorTest {
 
   @Test
   fun `test file header generation`() {
-    val rustFile = generateSource(
-      KotlinSourceFile(
-        "Test.kt",
-        """
+    val rustFile =
+      generateSource(
+        KotlinSourceFile(
+          "Test.kt",
+          """
             package com.example
 
             import kotlinx.serialization.Serializable
 
             @Serializable
             data class Test(val value: String)
-            """.trimIndent()
+            """
+            .trimIndent(),
+        )
       )
-    )
 
     val content = rustFile.readText()
     assertThat(content).contains("//! Auto-generated Rust module from Kotlin sources")
@@ -350,10 +375,11 @@ class RustGeneratorProcessorTest {
 
   @Test
   fun `test camelCase to snake_case conversion`() {
-    val rustFile = generateSource(
-      KotlinSourceFile(
-        "CamelCase.kt",
-        """
+    val rustFile =
+      generateSource(
+        KotlinSourceFile(
+          "CamelCase.kt",
+          """
             package com.example
 
             import kotlinx.serialization.Serializable
@@ -365,9 +391,10 @@ class RustGeneratorProcessorTest {
                 val emailAddress: String,
                 val phoneNumber: String
             )
-            """.trimIndent()
+            """
+            .trimIndent(),
+        )
       )
-    )
 
     val content = rustFile.readText()
     assertThat(content).contains("pub first_name: String")
@@ -378,33 +405,36 @@ class RustGeneratorProcessorTest {
 
   @Test
   fun `test filter by package`() {
-    val rustFiles = generateSources(
-      listOf(
-        KotlinSourceFile(
-          "Included.kt",
-          """
+    val rustFiles =
+      generateSources(
+        listOf(
+          KotlinSourceFile(
+            "Included.kt",
+            """
             package com.example.models
 
             import kotlinx.serialization.Serializable
 
             @Serializable
             data class Included(val value: String)
-            """.trimIndent()
-        ),
-        KotlinSourceFile(
-          "Excluded.kt",
-          """
+            """
+              .trimIndent(),
+          ),
+          KotlinSourceFile(
+            "Excluded.kt",
+            """
             package com.other
 
             import kotlinx.serialization.Serializable
 
             @Serializable
             data class Excluded(val value: String)
-            """.trimIndent()
-        )
-      ),
-      mapOf("rust.filter.packages" to "com.example")
-    )
+            """
+              .trimIndent(),
+          ),
+        ),
+        mapOf("rust.filter.packages" to "com.example"),
+      )
 
     assertThat(rustFiles[0].exists()).isTrue()
     assertThat(rustFiles[1].exists()).isFalse()
@@ -412,33 +442,36 @@ class RustGeneratorProcessorTest {
 
   @Test
   fun `test filter by file`() {
-    val rustFiles = generateSources(
-      listOf(
-        KotlinSourceFile(
-          "Included.kt",
-          """
+    val rustFiles =
+      generateSources(
+        listOf(
+          KotlinSourceFile(
+            "Included.kt",
+            """
             package com.example
 
             import kotlinx.serialization.Serializable
 
             @Serializable
             data class Included(val value: String)
-            """.trimIndent()
-        ),
-        KotlinSourceFile(
-          "Excluded.kt",
-          """
+            """
+              .trimIndent(),
+          ),
+          KotlinSourceFile(
+            "Excluded.kt",
+            """
             package com.example
 
             import kotlinx.serialization.Serializable
 
             @Serializable
             data class Excluded(val value: String)
-            """.trimIndent()
-        )
-      ),
-      mapOf("rust.filter.files" to "Included.kt")
-    )
+            """
+              .trimIndent(),
+          ),
+        ),
+        mapOf("rust.filter.files" to "Included.kt"),
+      )
 
     assertThat(rustFiles[0].exists()).isTrue()
     assertThat(rustFiles[1].exists()).isFalse()
@@ -446,32 +479,35 @@ class RustGeneratorProcessorTest {
 
   @Test
   fun `test process multiple files`() {
-    val rustFiles = generateSources(
-      listOf(
-        KotlinSourceFile(
-          "Test.kt",
-          """
+    val rustFiles =
+      generateSources(
+        listOf(
+          KotlinSourceFile(
+            "Test.kt",
+            """
             package com.anything
 
             import kotlinx.serialization.Serializable
 
             @Serializable
             data class Test(val value: String)
-            """.trimIndent()
-        ),
-        KotlinSourceFile(
-          "Test2.kt",
-          """
+            """
+              .trimIndent(),
+          ),
+          KotlinSourceFile(
+            "Test2.kt",
+            """
             package com.anything
 
             import kotlinx.serialization.Serializable
 
             @Serializable
             data class Test2(val value: String)
-            """.trimIndent()
-        ),
+            """
+              .trimIndent(),
+          ),
+        )
       )
-    )
 
     assertThat(rustFiles[0].exists()).isTrue()
     assertThat(rustFiles[1].exists()).isTrue()
@@ -480,10 +516,11 @@ class RustGeneratorProcessorTest {
 
   @Test
   fun `test boolean type mapping`() {
-    val rustFile = generateSource(
-      KotlinSourceFile(
-        "Flags.kt",
-        """
+    val rustFile =
+      generateSource(
+        KotlinSourceFile(
+          "Flags.kt",
+          """
             package com.example
 
             import kotlinx.serialization.Serializable
@@ -493,9 +530,10 @@ class RustGeneratorProcessorTest {
                 val isActive: Boolean,
                 val isEnabled: Boolean?
             )
-            """.trimIndent()
+            """
+            .trimIndent(),
+        )
       )
-    )
 
     val content = rustFile.readText()
     assertThat(content).contains("pub is_active: bool")
@@ -504,10 +542,11 @@ class RustGeneratorProcessorTest {
 
   @Test
   fun `test custom serialNameAnnotation configuration`() {
-    val rustFile = generateSource(
-      KotlinSourceFile(
-        "CustomAnnotation.kt",
-        """
+    val rustFile =
+      generateSource(
+        KotlinSourceFile(
+          "CustomAnnotation.kt",
+          """
             package com.example
 
             import kotlinx.serialization.Serializable
@@ -521,10 +560,12 @@ class RustGeneratorProcessorTest {
                 @CustomSerialName("custom_name")
                 val name: String
             )
-            """.trimIndent()
-      ),
-      additionalKspArgs = mapOf("rust.serialNameAnnotation" to "com.example.CustomSerialName.value")
-    )
+            """
+            .trimIndent(),
+        ),
+        additionalKspArgs =
+          mapOf("rust.serialNameAnnotation" to "com.example.CustomSerialName.value"),
+      )
 
     val content = rustFile.readText()
     assertThat(content).contains("#[serde(rename = \"custom_id\")]")
@@ -535,10 +576,11 @@ class RustGeneratorProcessorTest {
 
   @Test
   fun `test custom serialNameAnnotation with different argument name`() {
-    val rustFile = generateSource(
-      KotlinSourceFile(
-        "CustomAnnotation2.kt",
-        """
+    val rustFile =
+      generateSource(
+        KotlinSourceFile(
+          "CustomAnnotation2.kt",
+          """
             package com.example
 
             import kotlinx.serialization.Serializable
@@ -552,10 +594,11 @@ class RustGeneratorProcessorTest {
                 @AltSerialName(foo = "alt_value")
                 val value: String
             )
-            """.trimIndent()
-      ),
-      additionalKspArgs = mapOf("rust.serialNameAnnotation" to "com.example.AltSerialName.foo")
-    )
+            """
+            .trimIndent(),
+        ),
+        additionalKspArgs = mapOf("rust.serialNameAnnotation" to "com.example.AltSerialName.foo"),
+      )
 
     val content = rustFile.readText()
     assertThat(content).contains("#[serde(rename = \"alt_id\")]")
@@ -568,37 +611,39 @@ class RustGeneratorProcessorTest {
 
   private fun generateSource(
     source: KotlinSourceFile,
-    additionalKspArgs: Map<String, String> = emptyMap()
+    additionalKspArgs: Map<String, String> = emptyMap(),
   ) = generateSources(listOf(source), additionalKspArgs).single()
 
   @OptIn(ExperimentalCompilerApi::class)
   @Test
   fun `test invalid serialNameAnnotation configuration fails`() {
-    val sourcesDir = tempDir.resolve("rust-sources").apply {
-      mkdirs()
-    }
-    val compilation = KotlinCompilation().apply {
-      useKsp2()
-      sources = listOf(
-        SourceFile.kotlin(
-          "Test.kt",
-          """
+    val sourcesDir = tempDir.resolve("rust-sources").apply { mkdirs() }
+    val compilation =
+      KotlinCompilation().apply {
+        useKsp2()
+        sources =
+          listOf(
+            SourceFile.kotlin(
+              "Test.kt",
+              """
           package com.example
 
           import kotlinx.serialization.Serializable
 
           @Serializable
           data class Test(val value: String)
-        """.trimIndent()
-        )
-      )
-      symbolProcessorProviders = mutableListOf(RustGeneratorProcessorProvider())
-      inheritClassPath = true
-      kspProcessorOptions = mutableMapOf(
-        "rust.output.dir" to sourcesDir.absolutePath,
-        "rust.serialNameAnnotation" to "InvalidFormat"
-      )
-    }
+        """
+                .trimIndent(),
+            )
+          )
+        symbolProcessorProviders = mutableListOf(RustGeneratorProcessorProvider())
+        inheritClassPath = true
+        kspProcessorOptions =
+          mutableMapOf(
+            "rust.output.dir" to sourcesDir.absolutePath,
+            "rust.serialNameAnnotation" to "InvalidFormat",
+          )
+      }
 
     // Should fail due to invalid format
     assertThat(compilation.compile().exitCode).isNotEqualTo(KotlinCompilation.ExitCode.OK)
@@ -607,31 +652,33 @@ class RustGeneratorProcessorTest {
   @OptIn(ExperimentalCompilerApi::class)
   @Test
   fun `test invalid discriminatorAnnotations configuration fails`() {
-    val sourcesDir = tempDir.resolve("rust-sources").apply {
-      mkdirs()
-    }
-    val compilation = KotlinCompilation().apply {
-      useKsp2()
-      sources = listOf(
-        SourceFile.kotlin(
-          "Test.kt",
-          """
+    val sourcesDir = tempDir.resolve("rust-sources").apply { mkdirs() }
+    val compilation =
+      KotlinCompilation().apply {
+        useKsp2()
+        sources =
+          listOf(
+            SourceFile.kotlin(
+              "Test.kt",
+              """
           package com.example
 
           import kotlinx.serialization.Serializable
 
           @Serializable
           data class Test(val value: String)
-        """.trimIndent()
-        )
-      )
-      symbolProcessorProviders = mutableListOf(RustGeneratorProcessorProvider())
-      inheritClassPath = true
-      kspProcessorOptions = mutableMapOf(
-        "rust.output.dir" to sourcesDir.absolutePath,
-        "rust.discriminatorAnnotations" to "InvalidFormat,AnotherInvalid"
-      )
-    }
+        """
+                .trimIndent(),
+            )
+          )
+        symbolProcessorProviders = mutableListOf(RustGeneratorProcessorProvider())
+        inheritClassPath = true
+        kspProcessorOptions =
+          mutableMapOf(
+            "rust.output.dir" to sourcesDir.absolutePath,
+            "rust.discriminatorAnnotations" to "InvalidFormat,AnotherInvalid",
+          )
+      }
 
     // Should fail due to invalid format
     assertThat(compilation.compile().exitCode).isNotEqualTo(KotlinCompilation.ExitCode.OK)
@@ -640,22 +687,20 @@ class RustGeneratorProcessorTest {
   @OptIn(ExperimentalCompilerApi::class)
   private fun generateSources(
     kotlinSourceFiles: List<KotlinSourceFile>,
-    additionalKspArgs: Map<String, String> = emptyMap()
+    additionalKspArgs: Map<String, String> = emptyMap(),
   ): List<File> {
-    val sourcesDir = tempDir.resolve("rust-sources").apply {
-      mkdirs()
-    }
-    val compilation = KotlinCompilation().apply {
-      useKsp2()
-      sources = kotlinSourceFiles.map { SourceFile.kotlin(it.name, it.contents) }
-      symbolProcessorProviders = mutableListOf(RustGeneratorProcessorProvider())
-      inheritClassPath = true
-      kspProcessorOptions = mutableMapOf(
-        "rust.output.dir" to sourcesDir.absolutePath
-      ).apply {
-        putAll(additionalKspArgs)
+    val sourcesDir = tempDir.resolve("rust-sources").apply { mkdirs() }
+    val compilation =
+      KotlinCompilation().apply {
+        useKsp2()
+        sources = kotlinSourceFiles.map { SourceFile.kotlin(it.name, it.contents) }
+        symbolProcessorProviders = mutableListOf(RustGeneratorProcessorProvider())
+        inheritClassPath = true
+        kspProcessorOptions =
+          mutableMapOf("rust.output.dir" to sourcesDir.absolutePath).apply {
+            putAll(additionalKspArgs)
+          }
       }
-    }
 
     assertThat(compilation.compile().exitCode).isEqualTo(KotlinCompilation.ExitCode.OK)
     return kotlinSourceFiles.map { sourcesDir.resolve(it.name.toRustSourceFileName()) }

@@ -25,25 +25,24 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.Modifier
 import java.io.File
 
-/**
- * KSP processor that generates Rust code from Kotlin models
- */
-class RustGeneratorProcessor(
-  private val logger: KSPLogger,
-  private val config: ProcessorConfig
-) : SymbolProcessor {
+/** KSP processor that generates Rust code from Kotlin models */
+class RustGeneratorProcessor(private val logger: KSPLogger, private val config: ProcessorConfig) :
+  SymbolProcessor {
 
-  private val generator = RustCodeGenerator(config.discriminatorAnnotations, config.serialNameAnnotation)
+  private val generator =
+    RustCodeGenerator(config.discriminatorAnnotations, config.serialNameAnnotation)
   private val fileClasses = mutableMapOf<String, MutableList<KSClassDeclaration>>()
-  private val sealedHierarchies = mutableMapOf<KSClassDeclaration, MutableList<KSClassDeclaration>>()
+  private val sealedHierarchies =
+    mutableMapOf<KSClassDeclaration, MutableList<KSClassDeclaration>>()
 
   override fun process(resolver: Resolver): List<KSAnnotated> {
     // Find all classes with marker annotations
-    val annotatedClasses = config.markerAnnotations.flatMap { annotation ->
-      resolver
-        .getSymbolsWithAnnotation(annotation)
-        .filterIsInstance<KSClassDeclaration>()
-    }.distinct()
+    val annotatedClasses =
+      config.markerAnnotations
+        .flatMap { annotation ->
+          resolver.getSymbolsWithAnnotation(annotation).filterIsInstance<KSClassDeclaration>()
+        }
+        .distinct()
 
     annotatedClasses.forEach { classDecl ->
       val containingFile = classDecl.containingFile
@@ -81,10 +80,8 @@ class RustGeneratorProcessor(
 
   private fun generateRustFiles() {
     fileClasses.forEach { (sourceFileName, classes: List<KSClassDeclaration>) ->
-      val rustFileName = sourceFileName
-        .removeSuffix(".kt")
-        .let { TypeMapper.toRustSnakeCaseName(it) }
-        .plus(".rs")
+      val rustFileName =
+        sourceFileName.removeSuffix(".kt").let { TypeMapper.toRustSnakeCaseName(it) }.plus(".rs")
 
       val content = buildString {
         // Add file header
@@ -98,20 +95,18 @@ class RustGeneratorProcessor(
             classDecl.modifiers.contains(Modifier.SEALED) -> {
               generateSealedClassAsEnum(classDecl)
             }
-
             classDecl.classKind == ClassKind.ENUM_CLASS -> {
               // Generate enum
               append(generator.generateEnum(classDecl))
               append("\n\n")
             }
-
-            classDecl.classKind == ClassKind.CLASS ||
-                classDecl.classKind == ClassKind.OBJECT -> {
+            classDecl.classKind == ClassKind.CLASS || classDecl.classKind == ClassKind.OBJECT -> {
               // Skip if this is a subclass of a sealed class (already generated)
-              val isSealed = classDecl.superTypes.any { superType ->
-                val superDecl = superType.resolve().declaration as? KSClassDeclaration
-                superDecl?.modifiers?.contains(Modifier.SEALED) == true
-              }
+              val isSealed =
+                classDecl.superTypes.any { superType ->
+                  val superDecl = superType.resolve().declaration as? KSClassDeclaration
+                  superDecl?.modifiers?.contains(Modifier.SEALED) == true
+                }
 
               if (!isSealed) {
                 // Generate regular struct

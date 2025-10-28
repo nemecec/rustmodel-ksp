@@ -21,9 +21,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 
-/**
- * Base sealed class for different message types
- */
+/** Base sealed class for different message types */
 @Serializable
 @OptIn(ExperimentalSerializationApi::class)
 @JsonClassDiscriminator("message_type")
@@ -32,21 +30,17 @@ sealed class Message {
   abstract val timestamp: Long
 }
 
-/**
- * A text message
- */
+/** A text message */
 @Serializable
 @SerialName("text")
 data class TextMessage(
   override val id: String,
   override val timestamp: Long,
   val content: String,
-  val sender: String
+  val sender: String,
 ) : Message()
 
-/**
- * An image message
- */
+/** An image message */
 @Serializable
 @SerialName("image")
 data class ImageMessage(
@@ -54,32 +48,23 @@ data class ImageMessage(
   override val timestamp: Long,
   val imageUrl: String,
   val thumbnailUrl: String?,
-  val caption: String?
+  val caption: String?,
 ) : Message()
 
-/**
- * A system notification message
- */
+/** A system notification message */
 @Serializable
 @SerialName("system")
 data class SystemMessage(
   override val id: String,
   override val timestamp: Long,
   val level: NotificationLevel,
-  val text: String
+  val text: String,
 ) : Message()
 
-/**
- * Notification severity levels
- */
+/** Notification severity levels */
 @Serializable
 enum class NotificationLevel {
-  @SerialName("info")
-  INFO,
-
-  @SerialName("warning")
-  WARNING,
-
-  @SerialName("error")
-  ERROR
+  @SerialName("info") INFO,
+  @SerialName("warning") WARNING,
+  @SerialName("error") ERROR
 }

@@ -19,17 +19,10 @@ package com.example.models
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-/**
- * Available themes for the application
- */
+/** Available themes for the application */
 @Serializable
 enum class Theme {
-  @SerialName("light")
-  LIGHT,
-
-  @SerialName("dark")
-  DARK,
-
-  @SerialName("auto")
-  AUTO
+  @SerialName("light") LIGHT,
+  @SerialName("dark") DARK,
+  @SerialName("auto") AUTO
 }
