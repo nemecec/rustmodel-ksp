@@ -234,8 +234,8 @@ class RustCodeGenerator(discriminatorAnnotations: Set<String>, serialNameAnnotat
 
   fun generateFileHeader(moduleName: String): String {
     return """
-            //! Auto-generated Rust module from Kotlin sources
-            //! Module: $moduleName
+            // Auto-generated Rust module from Kotlin sources
+            // Module: $moduleName
 
         """
       .trimIndent()

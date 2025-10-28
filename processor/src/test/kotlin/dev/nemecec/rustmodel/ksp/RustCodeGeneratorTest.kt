@@ -41,20 +41,20 @@ class RustCodeGeneratorTest {
   fun `test generateFileHeader`() {
     val header = generator.generateFileHeader("TestModule")
 
-    assertThat(header).contains("//! Auto-generated Rust module from Kotlin sources")
-    assertThat(header).contains("//! Module: TestModule")
+    assertThat(header).contains("// Auto-generated Rust module from Kotlin sources")
+    assertThat(header).contains("// Module: TestModule")
   }
 
   @Test
   fun `test generateFileHeader with different module names`() {
     val header1 = generator.generateFileHeader("User")
-    assertThat(header1).contains("//! Module: User")
+    assertThat(header1).contains("// Module: User")
 
     val header2 = generator.generateFileHeader("UserProfile")
-    assertThat(header2).contains("//! Module: UserProfile")
+    assertThat(header2).contains("// Module: UserProfile")
 
     val header3 = generator.generateFileHeader("ComplexModelName")
-    assertThat(header3).contains("//! Module: ComplexModelName")
+    assertThat(header3).contains("// Module: ComplexModelName")
   }
 
   @Test
@@ -62,7 +62,7 @@ class RustCodeGeneratorTest {
     val header = generator.generateFileHeader("Test")
 
     val lines = header.lines()
-    assertThat(lines.any { it.startsWith("//!") }).isTrue()
+    assertThat(lines.any { it.startsWith("// ") }).isTrue()
   }
 
   @Test

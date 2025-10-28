@@ -369,8 +369,8 @@ class RustGeneratorProcessorTest {
       )
 
     val content = rustFile.readText()
-    assertThat(content).contains("//! Auto-generated Rust module from Kotlin sources")
-    assertThat(content).contains("//! Module: Test")
+    assertThat(content).contains("// Auto-generated Rust module from Kotlin sources")
+    assertThat(content).contains("// Module: Test")
   }
 
   @Test
