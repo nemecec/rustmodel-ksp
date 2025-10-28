@@ -31,9 +31,11 @@ Create `gradle/libs.versions.toml`:
 kotlin = "2.2.20"
 ksp = "2.2.20-2.0.2"
 kotlinx-serialization = "1.9.0"
+rustmodel-ksp-processor = "1.0.0"
 
 [libraries]
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+rustmodel-ksp-processor = { module = "dev.nemecec.rustmodel.ksp:processor", version.ref = "rustmodel-ksp-processor"}
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -54,11 +56,7 @@ plugins {
 
 dependencies {
   implementation(libs.kotlinx.serialization.json)
-  ksp(project(":processor"))
-}
-
-kotlin {
-  jvmToolchain(17)
+  ksp(libs.rustmodel.ksp.processor)
 }
 ```
 
