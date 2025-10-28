@@ -65,62 +65,62 @@ subprojects {
       }
     }
   }
-}
 
-// Don't attempt to sign anything if we don't have an in-memory key. Otherwise, the 'build' task
-// triggers 'signJsPublication' even when we aren't publishing (and so don't have signing keys).
-tasks.withType<Sign>().configureEach {
-  enabled = project.findProperty("signingInMemoryKey") != null
-}
-
-val javaVersion = JavaVersion.VERSION_1_8
-
-tasks.withType(JavaCompile::class.java).configureEach {
-  sourceCompatibility = javaVersion.toString()
-  targetCompatibility = javaVersion.toString()
-}
-
-tasks.withType(KotlinJvmCompile::class.java).configureEach {
-  compilerOptions {
-    jvmTarget.set(JvmTarget.fromTarget(javaVersion.toString()))
+  // Don't attempt to sign anything if we don't have an in-memory key. Otherwise, the 'build' task
+  // triggers 'signJsPublication' even when we aren't publishing (and so don't have signing keys).
+  tasks.withType<Sign>().configureEach {
+    enabled = project.findProperty("signingInMemoryKey") != null
   }
-}
 
-plugins.withId("com.vanniktech.maven.publish.base") {
-  configure<PublishingExtension> {
-    repositories {
-      maven {
-        name = "testMaven"
-        url = rootProject.layout.buildDirectory.dir("testMaven").get().asFile.toURI()
-      }
+  val javaVersion = JavaVersion.VERSION_1_8
+
+  tasks.withType(JavaCompile::class.java).configureEach {
+    sourceCompatibility = javaVersion.toString()
+    targetCompatibility = javaVersion.toString()
+  }
+
+  tasks.withType(KotlinJvmCompile::class.java).configureEach {
+    compilerOptions {
+      jvmTarget.set(JvmTarget.fromTarget(javaVersion.toString()))
     }
   }
-  configure<MavenPublishBaseExtension> {
-    publishToMavenCentral(automaticRelease = true)
-    signAllPublications()
-    coordinates(group.toString(), name, version.toString())
-    pom {
-      description.set("Rust object model generator KSP plugin")
-      name.set(project.name)
-      url.set("https://github.com/nemecec/rustmodel-ksp")
-      licenses {
-        license {
-          name.set("The Apache Software License, Version 2.0")
-          url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-          distribution.set("repo")
+
+  plugins.withId("com.vanniktech.maven.publish.base") {
+    configure<PublishingExtension> {
+      repositories {
+        maven {
+          name = "testMaven"
+          url = rootProject.layout.buildDirectory.dir("testMaven").get().asFile.toURI()
         }
       }
-      developers {
-        developer {
-          id.set("nemecec")
-          name.set("Neeme Praks")
-          url.set("https://github.com/nemecec/")
-        }
-      }
-      scm {
+    }
+    configure<MavenPublishBaseExtension> {
+      publishToMavenCentral(automaticRelease = true)
+      signAllPublications()
+      coordinates(group.toString(), name, version.toString())
+      pom {
+        description.set("Rust object model generator KSP plugin")
+        name.set(project.name)
         url.set("https://github.com/nemecec/rustmodel-ksp")
-        connection.set("scm:git:https://github.com/nemecec/rustmodel-ksp.git")
-        developerConnection.set("scm:git:ssh://git@github.com/nemecec/rustmodel-ksp.git")
+        licenses {
+          license {
+            name.set("The Apache Software License, Version 2.0")
+            url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+            distribution.set("repo")
+          }
+        }
+        developers {
+          developer {
+            id.set("nemecec")
+            name.set("Neeme Praks")
+            url.set("https://github.com/nemecec/")
+          }
+        }
+        scm {
+          url.set("https://github.com/nemecec/rustmodel-ksp")
+          connection.set("scm:git:https://github.com/nemecec/rustmodel-ksp.git")
+          developerConnection.set("scm:git:ssh://git@github.com/nemecec/rustmodel-ksp.git")
+        }
       }
     }
   }
