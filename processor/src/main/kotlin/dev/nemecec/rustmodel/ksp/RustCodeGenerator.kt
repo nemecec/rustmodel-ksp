@@ -58,7 +58,11 @@ private fun String.parseAnnotationConfig(): AnnotationConfig {
 }
 
 /** Generates Rust code from Kotlin class declarations */
-class RustCodeGenerator(discriminatorAnnotations: Set<String>, serialNameAnnotation: String) {
+class RustCodeGenerator(
+  discriminatorAnnotations: Set<String>,
+  serialNameAnnotation: String,
+  private val keywordTemplate: String,
+) {
   // Validate configurations on initialization to fail fast
   private val serialNameConfig: AnnotationConfig = serialNameAnnotation.parseAnnotationConfig()
   private val discriminatorConfigs: Map<String, AnnotationConfig> =
@@ -82,17 +86,30 @@ class RustCodeGenerator(discriminatorAnnotations: Set<String>, serialNameAnnotat
       builder.addDocComments(property, indent = "    ")
 
       val originalFieldName = property.simpleName.asString()
-      val fieldName = TypeMapper.toRustSnakeCaseName(originalFieldName)
+      val baseFieldName = TypeMapper.toRustSnakeCaseName(originalFieldName)
       val fieldType = property.type.resolve()
       val rustType = TypeMapper.mapType(fieldType)
+
+      // Validate that the field name can be escaped with the configured template
+      TypeMapper.validateKeywordEscaping(baseFieldName, keywordTemplate)
+
+      // Escape the field name if it's a Rust keyword
+      val fieldName = TypeMapper.escapeFieldNameIfNeeded(baseFieldName, keywordTemplate)
 
       // Check for serialization annotations or field name conversion
       val serialName = property.getSerialName()
       val nameToSerialize = serialName ?: originalFieldName
 
-      // Add serde rename attribute if the serialization name differs from the Rust field name
-      // This handles both explicit @SerialName annotations and camelCase to snake_case conversions
-      if (fieldName != nameToSerialize) {
+      // Determine if we need to add serde rename attribute
+      // We need it if:
+      // 1. The base field name (without keyword escaping) differs from the name to serialize
+      // 2. OR we used a non-raw-identifier template (anything other than "r#{field}")
+      val needsRename =
+        baseFieldName != nameToSerialize ||
+          (TypeMapper.isRustKeyword(baseFieldName) &&
+            !TypeMapper.isRawIdentifierTemplate(keywordTemplate))
+
+      if (needsRename) {
         builder.append("    #[serde(rename = \"$nameToSerialize\")]\n")
       }
 

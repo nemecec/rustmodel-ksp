@@ -35,6 +35,7 @@ class RustCodeGeneratorTest {
           "kotlinx.serialization.Polymorphic.value",
         ),
       serialNameAnnotation = "kotlinx.serialization.SerialName.value",
+      keywordTemplate = "r#{field}",
     )
 
   @Test
@@ -72,6 +73,7 @@ class RustCodeGeneratorTest {
           discriminatorAnnotations =
             setOf("kotlinx.serialization.json.JsonClassDiscriminator.discriminator"),
           serialNameAnnotation = "NoDotsInThisString",
+          keywordTemplate = "r#{field}",
         )
       }
       .isInstanceOf(IllegalArgumentException::class)
@@ -87,6 +89,7 @@ class RustCodeGeneratorTest {
           discriminatorAnnotations =
             setOf("kotlinx.serialization.json.JsonClassDiscriminator.discriminator"),
           serialNameAnnotation = "kotlinx.serialization.SerialName.",
+          keywordTemplate = "r#{field}",
         )
       }
       .isInstanceOf(IllegalArgumentException::class)
@@ -102,6 +105,7 @@ class RustCodeGeneratorTest {
           discriminatorAnnotations =
             setOf("kotlinx.serialization.json.JsonClassDiscriminator.discriminator"),
           serialNameAnnotation = ".",
+          keywordTemplate = "r#{field}",
         )
       }
       .isInstanceOf(IllegalArgumentException::class)
@@ -116,6 +120,7 @@ class RustCodeGeneratorTest {
         RustCodeGenerator(
           discriminatorAnnotations = setOf("NoDot"),
           serialNameAnnotation = "kotlinx.serialization.SerialName.value",
+          keywordTemplate = "r#{field}",
         )
       }
       .isInstanceOf(IllegalArgumentException::class)
@@ -135,6 +140,7 @@ class RustCodeGeneratorTest {
               "kotlinx.serialization.Polymorphic.value",
             ),
           serialNameAnnotation = "kotlinx.serialization.SerialName.value",
+          keywordTemplate = "r#{field}",
         )
       }
       .isInstanceOf(IllegalArgumentException::class)

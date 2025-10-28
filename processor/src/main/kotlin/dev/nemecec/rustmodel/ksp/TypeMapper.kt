@@ -22,6 +22,134 @@ import com.google.devtools.ksp.symbol.KSType
 /** Maps Kotlin types to their Rust equivalents */
 object TypeMapper {
 
+  /**
+   * Special Rust path keywords that cannot be escaped with raw identifiers (r#). These keywords
+   * have special meaning in Rust's module system and path resolution:
+   * - `super`: refers to the parent module
+   * - `self`: refers to the current module
+   * - `crate`: refers to the crate root
+   *
+   * When these appear as field names, they must use a non-raw-identifier escape strategy (e.g.,
+   * suffix like "{field}_kw" or prefix like "kw_{field}").
+   */
+  private val RUST_PATH_KEYWORDS = setOf("super", "self", "crate")
+
+  /**
+   * Complete set of Rust keywords that need to be escaped when used as field names. Includes strict
+   * keywords, reserved keywords, and weak keywords.
+   */
+  private val RUST_KEYWORDS =
+    setOf(
+      // Strict keywords (always reserved)
+      "as",
+      "break",
+      "const",
+      "continue",
+      "crate",
+      "else",
+      "enum",
+      "extern",
+      "false",
+      "fn",
+      "for",
+      "if",
+      "impl",
+      "in",
+      "let",
+      "loop",
+      "match",
+      "mod",
+      "move",
+      "mut",
+      "pub",
+      "ref",
+      "return",
+      "self",
+      "Self",
+      "static",
+      "struct",
+      "super",
+      "trait",
+      "true",
+      "type",
+      "unsafe",
+      "use",
+      "where",
+      "while",
+
+      // Keywords added in Rust 2018+
+      "async",
+      "await",
+      "dyn",
+
+      // Reserved keywords (not currently used but reserved for future use)
+      "abstract",
+      "become",
+      "box",
+      "do",
+      "final",
+      "macro",
+      "override",
+      "priv",
+      "typeof",
+      "unsized",
+      "virtual",
+      "yield",
+
+      // Weak keywords (context-dependent, but safer to escape)
+      "union",
+    )
+
+  /** Checks if a field name is a Rust keyword. */
+  fun isRustKeyword(name: String): Boolean = name in RUST_KEYWORDS
+
+  /**
+   * Escapes a field name if it's a Rust keyword by applying the specified template.
+   *
+   * Template format uses {field} as placeholder:
+   * - "r#{field}" - prefix only (raw identifier)
+   * - "{field}_kw" - suffix only
+   * - "kw_{field}_field" - prefix and suffix
+   *
+   * @param name The field name to potentially escape
+   * @param keywordTemplate The template to apply (e.g., "r#{field}" for raw identifiers)
+   * @return The escaped field name if it's a keyword, otherwise the original name
+   */
+  fun escapeFieldNameIfNeeded(name: String, keywordTemplate: String): String {
+    return if (isRustKeyword(name)) {
+      keywordTemplate.replace("{field}", name)
+    } else {
+      name
+    }
+  }
+
+  /**
+   * Checks if the template uses raw identifier syntax (r# prefix). Raw identifiers don't require
+   * serde rename attributes.
+   */
+  fun isRawIdentifierTemplate(template: String): Boolean {
+    return template == "r#{field}"
+  }
+
+  /**
+   * Validates that a field name can be escaped using the given template.
+   *
+   * @param name The field name to validate
+   * @param keywordTemplate The keyword escape template to use
+   * @throws IllegalArgumentException if the field name is a path keyword and the template uses raw
+   *   identifiers
+   */
+  fun validateKeywordEscaping(name: String, keywordTemplate: String) {
+    require(!(name in RUST_PATH_KEYWORDS && isRawIdentifierTemplate(keywordTemplate))) {
+      "Field name '$name' cannot be escaped with raw identifiers (r#) in Rust. " +
+        "The keywords 'super', 'self', and 'crate' have special meaning in Rust's path resolution " +
+        "and cannot be used as raw identifiers. " +
+        "Please configure a different keyword template using suffix or prefix patterns. " +
+        "Examples: '{field}_kw', 'kw_{field}', or 'kw_{field}_kw'. " +
+        "Set this in your KSP options with: rust.keywordTemplate={field}_kw"
+    }
+  }
+
   fun mapType(type: KSType, nullable: Boolean = type.isMarkedNullable): String {
     val baseType =
       when (val declaration = type.declaration) {

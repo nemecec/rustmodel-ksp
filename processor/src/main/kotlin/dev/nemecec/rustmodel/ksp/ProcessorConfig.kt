@@ -25,6 +25,7 @@ private val DEFAULT_DISCRIMINATOR_ANNOTATIONS =
     "kotlinx.serialization.Polymorphic.value",
   )
 private const val DEFAULT_SERIAL_NAME_ANNOTATION = "kotlinx.serialization.SerialName.value"
+private const val DEFAULT_KEYWORD_TEMPLATE = "r#{field}"
 
 fun Map<String, String>.toConfig() =
   ProcessorConfig(
@@ -36,6 +37,7 @@ fun Map<String, String>.toConfig() =
     discriminatorAnnotations =
       this["rust.discriminatorAnnotations"]?.parseSet() ?: DEFAULT_DISCRIMINATOR_ANNOTATIONS,
     serialNameAnnotation = this["rust.serialNameAnnotation"] ?: DEFAULT_SERIAL_NAME_ANNOTATION,
+    keywordTemplate = this["rust.keywordTemplate"] ?: DEFAULT_KEYWORD_TEMPLATE,
   )
 
 fun String.parseSet() = split(",").map { it.trim() }.filter { it.isNotEmpty() }.toSet()
@@ -47,6 +49,7 @@ data class ProcessorConfig(
   val markerAnnotations: Set<String>,
   val discriminatorAnnotations: Set<String>,
   val serialNameAnnotation: String,
+  val keywordTemplate: String,
 ) {
 
   fun shouldProcess(packageName: String?, fileName: String?): Boolean {

@@ -24,7 +24,9 @@ import com.tschuchort.compiletesting.SourceFile
 import com.tschuchort.compiletesting.kspProcessorOptions
 import com.tschuchort.compiletesting.symbolProcessorProviders
 import com.tschuchort.compiletesting.useKsp2
+import dev.nemecec.rustmodel.ksp.fixtures.CamelCaseKeywords
 import dev.nemecec.rustmodel.ksp.fixtures.Container
+import dev.nemecec.rustmodel.ksp.fixtures.KeywordFields
 import dev.nemecec.rustmodel.ksp.fixtures.Person
 import dev.nemecec.rustmodel.ksp.fixtures.Profile
 import dev.nemecec.rustmodel.ksp.fixtures.Status
@@ -280,6 +282,133 @@ class RustCompilationTest {
 
     val testPassed =
       cargoOutput.contains("test test_field_name_conversion ... ok") ||
+        cargoOutput.contains("test result: ok")
+    assertThat(testPassed).isTrue()
+  }
+
+  @Test
+  fun `test Rust keyword field names with raw identifiers`() {
+    val kotlinSource = readFixtureSource("Keywords.kt")
+
+    // Create instance with keyword field names
+    val keywordInstance =
+      KeywordFields(
+        `as` = "as_value",
+        `break` = false,
+        `continue` = true,
+        `do` = "do_value",
+        `else` = "else_value",
+        `false` = true,
+        `for` = "for_value",
+        `if` = "if_value",
+        `in` = true,
+        `return` = "return_value",
+        `true` = false,
+        `typeof` = "typeof_value",
+        `while` = "while_value",
+        type = "test_type",
+        match = "test_match",
+        async = true,
+        const = 42,
+        static = "static_value",
+        trait = "trait_value",
+        struct = "struct_value",
+        enum = "enum_value",
+        impl = "impl_value",
+        loop = 1,
+        mod = "mod_value",
+        pub = "pub_value",
+        use = "use_value",
+        extern = "extern_value",
+        fn = "fn_value",
+        let = "let_value",
+        mut = "mut_value",
+        ref = "ref_value",
+        move = "move_value",
+        where = "where_value",
+        unsafe = "unsafe_value",
+        await = "await_value",
+        dyn = "dyn_value",
+        abstract = "abstract_value",
+        become = "become_value",
+        box = "box_value",
+        final = "final_value",
+        macro = "macro_value",
+        override = "override_value",
+        priv = "priv_value",
+        unsized = "unsized_value",
+        virtual = "virtual_value",
+        yield = "yield_value",
+        union = "union_value",
+      )
+    val testJson = json.encodeToString(keywordInstance)
+
+    val rustCode = generateRustCode("Keywords.kt", kotlinSource)
+    val cargoOutput =
+      compileAndRunRustTest(
+        rustCode = rustCode,
+        testCode =
+          """
+                #[test]
+                fn test_keyword_fields() {
+                    let json_input = r#"$testJson"#;
+                    let kw: KeywordFields = serde_json::from_str(json_input).unwrap();
+
+                    // Verify all keyword fields can be accessed with r# prefix
+                    assert_eq!(kw.r#type, "test_type");
+                    assert_eq!(kw.r#match, "test_match");
+                    assert_eq!(kw.r#async, true);
+                    assert_eq!(kw.r#const, 42);
+                    assert_eq!(kw.r#static, "static_value");
+                    assert_eq!(kw.r#trait, "trait_value");
+
+                    // Verify JSON serialization maintains original field names
+                    let json_output = serde_json::to_string(&kw).unwrap();
+                    assert_eq!(json_output, json_input);
+                }
+            """
+            .trimIndent(),
+      )
+
+    val testPassed =
+      cargoOutput.contains("test test_keyword_fields ... ok") ||
+        cargoOutput.contains("test result: ok")
+    assertThat(testPassed).isTrue()
+  }
+
+  @Test
+  fun `test camelCase keyword field names`() {
+    val kotlinSource = readFixtureSource("Keywords.kt")
+
+    val instance = CamelCaseKeywords(myType = "type1", matchValue = "match1", asyncTask = true)
+    val testJson = json.encodeToString(instance)
+
+    val rustCode = generateRustCode("Keywords.kt", kotlinSource)
+    val cargoOutput =
+      compileAndRunRustTest(
+        rustCode = rustCode,
+        testCode =
+          """
+                #[test]
+                fn test_camelcase_keyword_fields() {
+                    let json_input = r#"$testJson"#;
+                    let kw: CamelCaseKeywords = serde_json::from_str(json_input).unwrap();
+
+                    // my_type is not a keyword, so no r# prefix needed
+                    assert_eq!(kw.my_type, "type1");
+                    assert_eq!(kw.match_value, "match1");
+                    assert_eq!(kw.async_task, true);
+
+                    // Verify JSON serialization uses camelCase
+                    let json_output = serde_json::to_string(&kw).unwrap();
+                    assert_eq!(json_output, json_input);
+                }
+            """
+            .trimIndent(),
+      )
+
+    val testPassed =
+      cargoOutput.contains("test test_camelcase_keyword_fields ... ok") ||
         cargoOutput.contains("test result: ok")
     assertThat(testPassed).isTrue()
   }

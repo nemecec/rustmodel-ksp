@@ -30,7 +30,11 @@ class RustGeneratorProcessor(private val logger: KSPLogger, private val config: 
   SymbolProcessor {
 
   private val generator =
-    RustCodeGenerator(config.discriminatorAnnotations, config.serialNameAnnotation)
+    RustCodeGenerator(
+      config.discriminatorAnnotations,
+      config.serialNameAnnotation,
+      config.keywordTemplate,
+    )
   private val fileClasses = mutableMapOf<String, MutableList<KSClassDeclaration>>()
   private val sealedHierarchies =
     mutableMapOf<KSClassDeclaration, MutableList<KSClassDeclaration>>()

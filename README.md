@@ -90,6 +90,11 @@ ksp {
   // Format: "qualified.annotation.Name.argumentName"
   // Default: SerialName.value
   arg("rust.serialNameAnnotation", "kotlinx.serialization.SerialName.value")
+
+  // Specify template for escaping Rust keyword field names
+  // Default: "r#{field}" (raw identifier syntax)
+  // Alternatives: "{field}_kw" (suffix), "kw_{field}" (prefix), etc.
+  arg("rust.keywordTemplate", "r#{field}")
 }
 ```
 
@@ -103,12 +108,20 @@ ksp {
 | `rust.markerAnnotations`        | Comma-separated annotations to look for                                                          | `kotlinx.serialization.Serializable`                                                                         |
 | `rust.discriminatorAnnotations` | Comma-separated discriminator annotations for sealed classes (format: `annotation.Name.argName`) | `kotlinx.serialization.json.JsonClassDiscriminator.discriminator`, `kotlinx.serialization.Polymorphic.value` |
 | `rust.serialNameAnnotation`     | Serial name annotation for field/enum renaming (format: `annotation.Name.argName`)               | `kotlinx.serialization.SerialName.value`                                                                     |
+| `rust.keywordTemplate`          | Template for escaping Rust keyword field names (use `{field}` placeholder)                       | `r#{field}` (raw identifier syntax)                                                                          |
 
 **Note:** By default, all files are processed. Use filters to restrict processing to specific packages or files.
 
 **Annotation Format:** For `discriminatorAnnotations` and `serialNameAnnotation`, specify both the annotation qualified
 name and the argument name separated by a dot (e.g., `com.example.MyAnnotation.myArgument`). This allows you to use
 custom annotations with different argument names.
+
+**Keyword Template:** The `rust.keywordTemplate` option controls how Rust keywords are escaped when used as Kotlin field names. The template uses `{field}` as a placeholder for the field name. Available strategies:
+
+- `r#{field}` (default): Uses Rust's raw identifier syntax (e.g., `r#type`, `r#match`). Raw identifiers don't require `serde(rename)` attributes, preserving the original field names in serialization.
+- Custom template: Any pattern with `{field}` placeholder (e.g., `kw_{field}`, `{field}_kw`, `kw_{field}_kw`). Adds a prefix or a suffix (or both) to the field name (e.g., `kw_type`, `kw_match`, `type_kw`, `match_kw`, `kw_type_kw`, `kw_match_kw`). Requires `serde(rename)` to maintain JSON compatibility.
+
+**Important:** The raw identifier syntax (`r#{field}`) cannot be used with Rust's path keywords (`super`, `self`, `crate`). If your Kotlin code uses these field names, use a custom template instead.
 
 ## Usage Examples
 
@@ -286,6 +299,44 @@ pub struct User {
     pub id: String,
     /// User's display name
     pub user_name: String,
+}
+```
+
+### Rust Keyword Handling
+
+**Kotlin:**
+
+```kotlin
+@Serializable
+data class Config(
+  val type: String,
+  val match: String,
+  val async: Boolean
+)
+```
+
+**Generated Rust (with default `r#{field}` template):**
+
+```rust
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct Config {
+    pub r#type: String,
+    pub r#match: String,
+    pub r#async: bool,
+}
+```
+
+**Generated Rust (with `{field}_kw` template):**
+
+```rust
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct Config {
+    #[serde(rename = "type")]
+    pub type_kw: String,
+    #[serde(rename = "match")]
+    pub match_kw: String,
+    #[serde(rename = "async")]
+    pub async_kw: bool,
 }
 ```
 
