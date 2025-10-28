@@ -1,26 +1,18 @@
 [versions]
-# Versions compatible with kotlin-compile-testing-ksp 1.5.0
-kotlin = "1.9.22"
-ksp = "1.9.22-1.0.17"
+kotlinversion = "2.2.20"
+ksp = "2.3.0"
 kotlinx-serialization = "1.6.2"
 kotlinpoet = "1.16.0"
-kotlin-compile-testing = "1.5.0"
+kctfork = "0.11.0"
 junit = "5.11.3"
 junit-platform = "1.11.3"
 assertk = "0.28.1"
 
 [libraries]
-# KSP
 ksp-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "ksp" }
-
-# KotlinPoet
 kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
-
-# Kotlinx Serialization
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
-
-# Testing
-kotlin-compile-testing-ksp = { module = "com.github.tschuchortdev:kotlin-compile-testing-ksp", version.ref = "kotlin-compile-testing" }
+kotlin-compile-testing-ksp = { module = "dev.zacsweers.kctfork:ksp", version.ref = "kctfork" }
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
 junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
@@ -28,9 +20,6 @@ junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher
 assertk = { module = "com.willowtreeapps.assertk:assertk", version.ref = "assertk" }
 
 [plugins]
-# Kotlin plugins
-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-
-# KSP plugin
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlinversion" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinversion" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }

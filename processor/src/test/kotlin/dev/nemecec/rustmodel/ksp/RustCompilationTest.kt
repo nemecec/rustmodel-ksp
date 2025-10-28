@@ -21,8 +21,9 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isTrue
 import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.SourceFile
-import com.tschuchort.compiletesting.kspArgs
+import com.tschuchort.compiletesting.kspProcessorOptions
 import com.tschuchort.compiletesting.symbolProcessorProviders
+import com.tschuchort.compiletesting.useKsp2
 import dev.nemecec.rustmodel.ksp.fixtures.Container
 import dev.nemecec.rustmodel.ksp.fixtures.Person
 import dev.nemecec.rustmodel.ksp.fixtures.Profile
@@ -30,6 +31,7 @@ import dev.nemecec.rustmodel.ksp.fixtures.Status
 import dev.nemecec.rustmodel.ksp.fixtures.User
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import org.junit.jupiter.api.Assumptions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -277,14 +279,16 @@ class RustCompilationTest {
     assertThat(testPassed).isTrue()
   }
 
+  @OptIn(ExperimentalCompilerApi::class)
   private fun generateRustCode(fileName: String, kotlinSource: String): String {
     val source = SourceFile.kotlin(fileName, kotlinSource)
 
     val compilation = KotlinCompilation().apply {
+      useKsp2()
       sources = listOf(source)
-      symbolProcessorProviders = listOf(RustGeneratorProcessorProvider())
+      symbolProcessorProviders = mutableListOf(RustGeneratorProcessorProvider())
       inheritClassPath = true
-      kspArgs = mutableMapOf(
+      kspProcessorOptions = mutableMapOf(
         "rust.output.dir" to tempDir.absolutePath,
         "rust.process.all" to "true"
       )

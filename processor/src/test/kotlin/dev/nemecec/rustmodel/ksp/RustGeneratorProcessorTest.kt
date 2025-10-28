@@ -24,8 +24,10 @@ import assertk.assertions.isNotEqualTo
 import assertk.assertions.isTrue
 import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.SourceFile
-import com.tschuchort.compiletesting.kspArgs
+import com.tschuchort.compiletesting.kspProcessorOptions
 import com.tschuchort.compiletesting.symbolProcessorProviders
+import com.tschuchort.compiletesting.useKsp2
+import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
@@ -569,12 +571,14 @@ class RustGeneratorProcessorTest {
     additionalKspArgs: Map<String, String> = emptyMap()
   ) = generateSources(listOf(source), additionalKspArgs).single()
 
+  @OptIn(ExperimentalCompilerApi::class)
   @Test
   fun `test invalid serialNameAnnotation configuration fails`() {
     val sourcesDir = tempDir.resolve("rust-sources").apply {
       mkdirs()
     }
     val compilation = KotlinCompilation().apply {
+      useKsp2()
       sources = listOf(
         SourceFile.kotlin(
           "Test.kt",
@@ -588,9 +592,9 @@ class RustGeneratorProcessorTest {
         """.trimIndent()
         )
       )
-      symbolProcessorProviders = listOf(RustGeneratorProcessorProvider())
+      symbolProcessorProviders = mutableListOf(RustGeneratorProcessorProvider())
       inheritClassPath = true
-      kspArgs = mutableMapOf(
+      kspProcessorOptions = mutableMapOf(
         "rust.output.dir" to sourcesDir.absolutePath,
         "rust.serialNameAnnotation" to "InvalidFormat"
       )
@@ -600,12 +604,14 @@ class RustGeneratorProcessorTest {
     assertThat(compilation.compile().exitCode).isNotEqualTo(KotlinCompilation.ExitCode.OK)
   }
 
+  @OptIn(ExperimentalCompilerApi::class)
   @Test
   fun `test invalid discriminatorAnnotations configuration fails`() {
     val sourcesDir = tempDir.resolve("rust-sources").apply {
       mkdirs()
     }
     val compilation = KotlinCompilation().apply {
+      useKsp2()
       sources = listOf(
         SourceFile.kotlin(
           "Test.kt",
@@ -619,9 +625,9 @@ class RustGeneratorProcessorTest {
         """.trimIndent()
         )
       )
-      symbolProcessorProviders = listOf(RustGeneratorProcessorProvider())
+      symbolProcessorProviders = mutableListOf(RustGeneratorProcessorProvider())
       inheritClassPath = true
-      kspArgs = mutableMapOf(
+      kspProcessorOptions = mutableMapOf(
         "rust.output.dir" to sourcesDir.absolutePath,
         "rust.discriminatorAnnotations" to "InvalidFormat,AnotherInvalid"
       )
@@ -631,6 +637,7 @@ class RustGeneratorProcessorTest {
     assertThat(compilation.compile().exitCode).isNotEqualTo(KotlinCompilation.ExitCode.OK)
   }
 
+  @OptIn(ExperimentalCompilerApi::class)
   private fun generateSources(
     kotlinSourceFiles: List<KotlinSourceFile>,
     additionalKspArgs: Map<String, String> = emptyMap()
@@ -639,10 +646,11 @@ class RustGeneratorProcessorTest {
       mkdirs()
     }
     val compilation = KotlinCompilation().apply {
+      useKsp2()
       sources = kotlinSourceFiles.map { SourceFile.kotlin(it.name, it.contents) }
-      symbolProcessorProviders = listOf(RustGeneratorProcessorProvider())
+      symbolProcessorProviders = mutableListOf(RustGeneratorProcessorProvider())
       inheritClassPath = true
-      kspArgs = mutableMapOf(
+      kspProcessorOptions = mutableMapOf(
         "rust.output.dir" to sourcesDir.absolutePath
       ).apply {
         putAll(additionalKspArgs)
