@@ -31,7 +31,7 @@ Create `gradle/libs.versions.toml`:
 kotlin = "2.2.20"
 ksp = "2.2.20-2.0.2"
 kotlinx-serialization = "1.9.0"
-rustmodel-ksp-processor = "1.0.1"
+rustmodel-ksp-processor = "1.1.0"
 
 [libraries]
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
