@@ -65,10 +65,12 @@ class RustCompilationTest {
     val cargoAvailable = try {
       val process = ProcessBuilder("cargo", "--version")
         .redirectErrorStream(true)
-        .redirectOutput(ProcessBuilder.Redirect.INHERIT)
         .start()
+      val output = process.inputStream.bufferedReader().readText()
+      println("Using $output")
       process.waitFor() == 0
-    } catch (_: Exception) {
+    } catch (e: Exception) {
+      println("Error while running Cargo: $e")
       false
     }
     Assumptions.assumeTrue(cargoAvailable, "Cargo is not available. Please install Rust toolchain.")
@@ -339,11 +341,12 @@ class RustCompilationTest {
     )
 
     // Run cargo test
-    val process = ProcessBuilder()
+    val processBuilder = ProcessBuilder()
       .command("cargo", "test", "--quiet", "--color", "never")
       .directory(cargoDir)
       .redirectErrorStream(true)
-      .start()
+    processBuilder.environment()["RUSTFLAGS"] = "-D warnings"
+    val process = processBuilder.start()
 
     val output = process.inputStream.bufferedReader().readText()
     val exitCode = process.waitFor()
