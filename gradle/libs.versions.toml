@@ -4,7 +4,7 @@ ksp = "2.3.0"
 kotlinx-serialization = "1.6.2"
 kotlinpoet = "1.16.0"
 kctfork = "0.11.0"
-junit = "5.11.3"
+junit = "6.0.0"
 junit-platform = "1.11.3"
 assertk = "0.28.1"
 
