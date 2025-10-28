@@ -235,10 +235,7 @@ class RustCodeGenerator(
             //! Auto-generated Rust module from Kotlin sources
             //! Module: $moduleName
 
-            use serde::{Deserialize, Serialize};
-            use std::collections::{HashMap, HashSet};
-
-
         """.trimIndent()
   }
+
 }

@@ -41,8 +41,6 @@ class RustCodeGeneratorTest {
 
     assertThat(header).contains("//! Auto-generated Rust module from Kotlin sources")
     assertThat(header).contains("//! Module: TestModule")
-    assertThat(header).contains("use serde::{Deserialize, Serialize};")
-    assertThat(header).contains("use std::collections::{HashMap, HashSet};")
   }
 
   @Test
@@ -55,15 +53,6 @@ class RustCodeGeneratorTest {
 
     val header3 = generator.generateFileHeader("ComplexModelName")
     assertThat(header3).contains("//! Module: ComplexModelName")
-  }
-
-  @Test
-  fun `test file header includes required imports`() {
-    val header = generator.generateFileHeader("Test")
-
-    // Check for required imports
-    assertThat(header).contains("use serde::{Deserialize, Serialize};")
-    assertThat(header).contains("use std::collections::{HashMap, HashSet};")
   }
 
   @Test

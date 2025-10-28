@@ -344,8 +344,6 @@ class RustGeneratorProcessorTest {
     val content = rustFile.readText()
     assertThat(content).contains("//! Auto-generated Rust module from Kotlin sources")
     assertThat(content).contains("//! Module: Test")
-    assertThat(content).contains("use serde::{Deserialize, Serialize};")
-    assertThat(content).contains("use std::collections::{HashMap, HashSet};")
   }
 
   @Test
