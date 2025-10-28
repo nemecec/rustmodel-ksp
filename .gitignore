@@ -30,3 +30,6 @@ bin/
 
 # KSP generated
 **/generated/
+
+# Claude code
+/.claude/
