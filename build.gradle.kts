@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
-import org.jetbrains.dokka.DokkaConfiguration.Visibility
-import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
-import org.jetbrains.dokka.gradle.DokkaTaskPartial
+import org.jetbrains.dokka.gradle.engine.parameters.VisibilityModifier
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 import java.net.URI
@@ -40,26 +38,30 @@ allprojects {
   version = "1.0.0"
 }
 
-tasks.named("dokkaHtmlMultiModule", DokkaMultiModuleTask::class.java).configure {
+dokka {
   moduleName.set("Rust object model generator KSP plugin")
 }
 
-allprojects {
-  tasks.withType<DokkaTaskPartial>().configureEach {
-    dokkaSourceSets.configureEach {
-      documentedVisibilities.set(
-        setOf(
-          Visibility.PUBLIC,
-          Visibility.PROTECTED
-        )
-      )
-      reportUndocumented.set(false)
-      jdkVersion.set(8)
+subprojects {
+  apply(plugin = "org.jetbrains.dokka")
 
-      sourceLink {
-        localDirectory.set(rootProject.projectDir)
-        remoteUrl.set(URI("https://github.com/nemecec/rustmodel-ksp/tree/main/").toURL())
-        remoteLineSuffix.set("#L")
+  pluginManager.withPlugin("org.jetbrains.dokka") {
+    configure<org.jetbrains.dokka.gradle.DokkaExtension> {
+      dokkaSourceSets.configureEach {
+        documentedVisibilities.set(
+          setOf(
+            VisibilityModifier.Public,
+            VisibilityModifier.Protected
+          )
+        )
+        reportUndocumented.set(false)
+        jdkVersion.set(8)
+
+        sourceLink {
+          localDirectory.set(rootProject.projectDir)
+          remoteUrl.set(URI("https://github.com/nemecec/rustmodel-ksp/tree/main/"))
+          remoteLineSuffix.set("#L")
+        }
       }
     }
   }
