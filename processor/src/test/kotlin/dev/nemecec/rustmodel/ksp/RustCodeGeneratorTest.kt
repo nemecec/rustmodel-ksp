@@ -16,13 +16,13 @@
 
 package dev.nemecec.rustmodel.ksp
 
+import assertk.assertFailure
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotNull
 import assertk.assertions.isTrue
 import assertk.assertions.message
-import assertk.assertFailure
 import org.junit.jupiter.api.Test
 
 class RustCodeGeneratorTest {

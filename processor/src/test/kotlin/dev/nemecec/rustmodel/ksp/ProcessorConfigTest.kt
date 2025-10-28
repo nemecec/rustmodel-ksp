@@ -187,7 +187,12 @@ class ProcessorConfigTest {
     ).toConfig()
 
     // Verify discriminator annotations are configured correctly
-    assertThat(config.discriminatorAnnotations).isEqualTo(setOf("com.example.CustomDiscriminator.type", "org.test.TypeTag.value"))
+    assertThat(config.discriminatorAnnotations).isEqualTo(
+      setOf(
+        "com.example.CustomDiscriminator.type",
+        "org.test.TypeTag.value"
+      )
+    )
   }
 
   @Test
@@ -197,10 +202,12 @@ class ProcessorConfigTest {
     ).toConfig()
 
     // Verify default discriminator annotations are used
-    assertThat(config.discriminatorAnnotations).isEqualTo(setOf(
-      "kotlinx.serialization.json.JsonClassDiscriminator.discriminator",
-      "kotlinx.serialization.Polymorphic.value"
-    ))
+    assertThat(config.discriminatorAnnotations).isEqualTo(
+      setOf(
+        "kotlinx.serialization.json.JsonClassDiscriminator.discriminator",
+        "kotlinx.serialization.Polymorphic.value"
+      )
+    )
   }
 
   @Test

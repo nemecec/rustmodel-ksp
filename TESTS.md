@@ -61,7 +61,8 @@ Unit tests for the `RustCodeGenerator` class that generates Rust code from Kotli
 
 ### 5. `RustCompilationTest` (Optional)
 
-End-to-end integration tests that validate the generated Rust code by compiling it with Cargo and verifying JSON serialization/deserialization compatibility between Kotlin and Rust.
+End-to-end integration tests that validate the generated Rust code by compiling it with Cargo and verifying JSON
+serialization/deserialization compatibility between Kotlin and Rust.
 
 **Test Coverage:**
 
@@ -77,7 +78,8 @@ End-to-end integration tests that validate the generated Rust code by compiling 
 - C compiler (for linking Rust dependencies)
 - On macOS: Xcode command-line tools with license agreement accepted
 
-**Note:** These tests are disabled by default and must be explicitly enabled with the system property `-Drust.compilation.tests.enabled=true`
+**Note:** These tests are disabled by default and must be explicitly enabled with the system property
+`-Drust.compilation.tests.enabled=true`
 
 ## Running Tests
 
@@ -112,7 +114,8 @@ Run with verbose output:
 
 ### Running Rust Compilation Tests
 
-The `RustCompilationTest` suite validates that the generated Rust code compiles and handles JSON the same way as Kotlin. These tests are optional and require additional setup:
+The `RustCompilationTest` suite validates that the generated Rust code compiles and handles JSON the same way as Kotlin.
+These tests are optional and require additional setup:
 
 **Prerequisites:**
 

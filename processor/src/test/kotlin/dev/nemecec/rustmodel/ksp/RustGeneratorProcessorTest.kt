@@ -577,9 +577,10 @@ class RustGeneratorProcessorTest {
       mkdirs()
     }
     val compilation = KotlinCompilation().apply {
-      sources = listOf(SourceFile.kotlin(
-        "Test.kt",
-        """
+      sources = listOf(
+        SourceFile.kotlin(
+          "Test.kt",
+          """
           package com.example
 
           import kotlinx.serialization.Serializable
@@ -587,7 +588,8 @@ class RustGeneratorProcessorTest {
           @Serializable
           data class Test(val value: String)
         """.trimIndent()
-      ))
+        )
+      )
       symbolProcessorProviders = listOf(RustGeneratorProcessorProvider())
       inheritClassPath = true
       kspArgs = mutableMapOf(
@@ -606,9 +608,10 @@ class RustGeneratorProcessorTest {
       mkdirs()
     }
     val compilation = KotlinCompilation().apply {
-      sources = listOf(SourceFile.kotlin(
-        "Test.kt",
-        """
+      sources = listOf(
+        SourceFile.kotlin(
+          "Test.kt",
+          """
           package com.example
 
           import kotlinx.serialization.Serializable
@@ -616,7 +619,8 @@ class RustGeneratorProcessorTest {
           @Serializable
           data class Test(val value: String)
         """.trimIndent()
-      ))
+        )
+      )
       symbolProcessorProviders = listOf(RustGeneratorProcessorProvider())
       inheritClassPath = true
       kspArgs = mutableMapOf(

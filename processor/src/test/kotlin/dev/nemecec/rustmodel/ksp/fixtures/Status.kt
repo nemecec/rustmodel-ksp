@@ -20,7 +20,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 enum class Status {
-    PENDING,
-    APPROVED,
-    REJECTED
+  PENDING,
+  APPROVED,
+  REJECTED
 }

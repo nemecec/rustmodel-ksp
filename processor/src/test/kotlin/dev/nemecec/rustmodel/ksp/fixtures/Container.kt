@@ -20,7 +20,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Container(
-    val items: List<String>,
-    val tags: Set<String>,
-    val metadata: Map<String, String>
+  val items: List<String>,
+  val tags: Set<String>,
+  val metadata: Map<String, String>
 )

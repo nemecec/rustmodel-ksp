@@ -83,7 +83,10 @@ ksp {
   // Specify discriminator annotations for sealed classes with argument names
   // Format: "qualified.annotation.Name.argumentName"
   // Default: JsonClassDiscriminator.discriminator, Polymorphic.value
-  arg("rust.discriminatorAnnotations", "kotlinx.serialization.json.JsonClassDiscriminator.discriminator,kotlinx.serialization.Polymorphic.value")
+  arg(
+    "rust.discriminatorAnnotations",
+    "kotlinx.serialization.json.JsonClassDiscriminator.discriminator,kotlinx.serialization.Polymorphic.value"
+  )
 
   // Specify serial name annotation with argument name for field/enum renaming
   // Format: "qualified.annotation.Name.argumentName"
@@ -105,7 +108,9 @@ ksp {
 
 **Note:** By default, all files are processed. Use filters to restrict processing to specific packages or files.
 
-**Annotation Format:** For `discriminatorAnnotations` and `serialNameAnnotation`, specify both the annotation qualified name and the argument name separated by a dot (e.g., `com.example.MyAnnotation.myArgument`). This allows you to use custom annotations with different argument names.
+**Annotation Format:** For `discriminatorAnnotations` and `serialNameAnnotation`, specify both the annotation qualified
+name and the argument name separated by a dot (e.g., `com.example.MyAnnotation.myArgument`). This allows you to use
+custom annotations with different argument names.
 
 ## Usage Examples
 

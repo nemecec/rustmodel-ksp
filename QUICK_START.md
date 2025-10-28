@@ -41,8 +41,8 @@ cat example/build/generated/rust/user.rs
 
 ```kotlin
 ksp {
-    arg("rust.output.dir", "${project.buildDir}/rust")
-    arg("rust.filter.packages", "com.example.models")
+  arg("rust.output.dir", "${project.buildDir}/rust")
+  arg("rust.filter.packages", "com.example.models")
 }
 ```
 
@@ -50,7 +50,7 @@ ksp {
 
 ```kotlin
 ksp {
-    arg("rust.filter.files", "User.kt,Product.kt")
+  arg("rust.filter.files", "User.kt,Product.kt")
 }
 ```
 
@@ -58,7 +58,7 @@ ksp {
 
 ```kotlin
 ksp {
-    arg("rust.process.all", "true")
+  arg("rust.process.all", "true")
 }
 ```
 

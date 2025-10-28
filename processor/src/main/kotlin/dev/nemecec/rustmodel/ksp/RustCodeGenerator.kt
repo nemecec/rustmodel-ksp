@@ -39,8 +39,8 @@ private fun String.parseAnnotationConfig(): AnnotationConfig {
 
   require(lastDotIndex != -1 && lastDotIndex < length - 1) {
     "Invalid annotation configuration format: '$this'. " +
-    "Expected format: 'qualified.annotation.Name.argumentName' " +
-    "(e.g., 'kotlinx.serialization.SerialName.value')"
+        "Expected format: 'qualified.annotation.Name.argumentName' " +
+        "(e.g., 'kotlinx.serialization.SerialName.value')"
   }
 
   val qualifiedName = substring(0, lastDotIndex)

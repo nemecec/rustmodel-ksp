@@ -17,7 +17,6 @@
 package dev.nemecec.rustmodel.ksp
 
 import java.io.File
-import kotlin.text.startsWith
 
 private const val DEFAULT_MARKER_ANNOTATION = "kotlinx.serialization.Serializable"
 private val DEFAULT_DISCRIMINATOR_ANNOTATIONS = setOf(
