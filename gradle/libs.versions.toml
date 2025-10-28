@@ -1,6 +1,8 @@
 [versions]
 kotlinversion = "2.2.20"
 ksp = "2.3.0"
+dokka = "2.0.0"
+maven-publish = "0.34.0"
 kotlinx-serialization = "1.6.2"
 kotlinpoet = "1.16.0"
 kctfork = "0.11.0"
@@ -23,3 +25,5 @@ assertk = { module = "com.willowtreeapps.assertk:assertk", version.ref = "assert
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlinversion" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinversion" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+maven-publish = { id = "com.vanniktech.maven.publish.base", version.ref = "maven-publish" }
