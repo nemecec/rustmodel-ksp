@@ -37,7 +37,7 @@ jobs:
           path: '**/build/test-results/test/TEST-*.xml'
           reporter: java-junit
 
-      - uses: mikepenz/action-junit-report@v5
+      - uses: mikepenz/action-junit-report@v6
         if: success() || failure()
         with:
           report_paths: '**/build/test-results/test/TEST-*.xml'
